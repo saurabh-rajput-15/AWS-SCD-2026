@@ -106,7 +106,7 @@ export const Preloader = ({ onComplete }: { onComplete: () => void; key?: string
       className="fixed inset-0 w-screen h-screen z-[100] flex items-center justify-center bg-[#050505] flex-col relative overflow-hidden"
     >
       <div
-        className="absolute inset-0 opacity-10 pointer-events-none"
+        className="absolute inset-0 opacity-15 pointer-events-none"
         style={{ backgroundImage: 'radial-gradient(#ffffff 0.5px, transparent 0.5px)', backgroundSize: '20px 20px' }}
       />
 
@@ -135,7 +135,7 @@ export const Preloader = ({ onComplete }: { onComplete: () => void; key?: string
               <span className="skew-x-[15deg] block">Start Engine</span>
             </button>
             <p className="mt-8 font-mono text-xs opacity-50 uppercase tracking-widest text-[#FF9900]">
-              Audio initialization required
+              Hear The V12 Engine Roar
             </p>
           </motion.div>
         ) : (
@@ -173,7 +173,7 @@ export const Preloader = ({ onComplete }: { onComplete: () => void; key?: string
         transition={{ repeat: Infinity, duration: 2 }}
         className="font-sans font-bold absolute bottom-24 text-white/50 tracking-[0.5em] text-[10px] md:text-sm uppercase"
       >
-        {started && (lights === 6 ? 'AND AWAY WE GO' : lights === 0 && started ? 'LIGHTS OUT...' : 'INITIALIZING TELEMETRY...')}
+        {started && (lights === 6 ? 'AND AWAY WE GO' : lights === 0 && started ? 'LIGHTS OUT...' : 'ARE YOU READY...')}
       </motion.p>
     </motion.div>
   );
