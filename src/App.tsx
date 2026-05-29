@@ -20,6 +20,7 @@ import { FooterSection } from './components/FooterSection';
 import { SponsorPage } from './components/SponsorPage';
 import { BackToTop } from './components/BackToTop';
 import { CustomCursor } from './components/CustomCursor';
+import { SoundButton } from './components/SoundButton';
 
 function HomePage() {
   const [loading, setLoading] = useState(true);
@@ -78,6 +79,7 @@ export default function App() {
       <Route path="/sponsors" element={<SponsorPage />} />
     </Routes>
     <BackToTop />
+    <SoundButton />
     <CustomCursor />
   </>
   );

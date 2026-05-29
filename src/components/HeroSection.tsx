@@ -1,6 +1,6 @@
 import { motion, useScroll, useTransform } from 'motion/react';
 import { AngledButton, TelemetryData } from './LayoutElements';
-import { ChevronRight, Volume2, VolumeX, Zap } from 'lucide-react';
+import { ChevronRight, Zap } from 'lucide-react';
 import { useRef, useState, useEffect } from 'react';
 
 export const HeroSection = () => {
@@ -8,11 +8,11 @@ export const HeroSection = () => {
   const y = useTransform(scrollY, [0, 500], [0, 150]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(false); // Starting unmuted because of preloader interaction
+  const [isMuted, setIsMuted] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
-       videoRef.current.volume = 0.6; // Slightly lower volume so it's not deafening
+       videoRef.current.volume = 0.6;
     }
 
     const handleGreenLight = () => {
@@ -21,16 +21,24 @@ export const HeroSection = () => {
        }
     };
 
-    window.addEventListener('greenLight', handleGreenLight);
-    return () => window.removeEventListener('greenLight', handleGreenLight);
-  }, []);
+    // Listen for toggleMute event from SoundButton
+    const handleToggleMute = () => {
+      if (videoRef.current) {
+        videoRef.current.muted = !videoRef.current.muted;
+        const muted = videoRef.current.muted;
+        setIsMuted(muted);
+        // Broadcast mute state so SoundButton icon stays in sync
+        window.dispatchEvent(new CustomEvent('muteStateChange', { detail: muted }));
+      }
+    };
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !videoRef.current.muted;
-      setIsMuted(videoRef.current.muted);
-    }
-  };
+    window.addEventListener('greenLight', handleGreenLight);
+    window.addEventListener('toggleMute', handleToggleMute);
+    return () => {
+      window.removeEventListener('greenLight', handleGreenLight);
+      window.removeEventListener('toggleMute', handleToggleMute);
+    };
+  }, []);
 
   return (
     <section className="relative min-h-[100svh] flex flex-col justify-center overflow-hidden border-b border-white/5 z-10 px-4 sm:px-12 lg:px-24 pt-20 sm:pt-24 lg:pt-28 pb-8">
@@ -60,10 +68,7 @@ export const HeroSection = () => {
            </div>
            <TelemetryData label="STATUS" value="LIVE" color="text-[#00ff00]" />
            <TelemetryData label="GRID" value="1,200+ BUILDERS" color="text-white" />
-           <button onClick={toggleMute} className="ml-auto flex items-center gap-1.5 sm:gap-2 bg-white/5 border border-white/10 px-2 sm:px-3 py-1 sm:py-1.5 hover:bg-white/10 transition-colors">
-              {isMuted ? <VolumeX size={12} className="text-[#E10600]" /> : <Volume2 size={12} className="text-[#00ff00]" />}
-              <span className="text-[9px] sm:text-[10px] uppercase tracking-widest font-mono opacity-70 hidden xs:inline">Team Radio</span>
-           </button>
+           {/* Sound button removed — now a separate floating SoundButton component */}
         </motion.div>
 
         <motion.h1
