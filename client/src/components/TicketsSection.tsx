@@ -1,15 +1,12 @@
 import { motion } from 'motion/react';
 import { SectionHeader } from './LayoutElements';
 import { Check, AlertCircle, Phone, Mail } from 'lucide-react';
-import { Link } from 'react-router-dom';
 import { usePassTypes } from '../features/ticketing/hooks/usePassTypes';
-import { useSettings } from '../features/ticketing/hooks/useSettings';
 import { Skeleton } from 'boneyard-js/react';
 
 export const TicketsSection = () => {
   const { passes, loading: passesLoading } = usePassTypes();
-  const { registrationEnabled, loading: settingsLoading } = useSettings();
-  const loading = passesLoading || settingsLoading;
+  const loading = passesLoading;
 
   const displayPasses = loading
     ? [
@@ -67,11 +64,7 @@ export const TicketsSection = () => {
       <Skeleton name="tickets-section" loading={loading}>
         <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mt-12 sm:mt-16 max-w-7xl mx-auto relative z-10 items-stretch">
           {displayPasses.map((tier, i) => {
-            const isSoldOut = tier.capacity - tier.sold <= 0;
-            const isLocked = tier.is_locked;
-            const isDisabled = isSoldOut || isLocked;
             const hex = tier.badge_color || '#ffffff';
-            const label = tier.label;
 
             return (
               <motion.div
@@ -81,11 +74,16 @@ export const TicketsSection = () => {
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.15, duration: 0.6 }}
                 style={{ 
-                  borderColor: `${hex}66`, 
-                  boxShadow: isDisabled ? 'none' : `0 0 40px ${hex}26` 
+                  borderColor: '#ffffff0D', 
+                  boxShadow: 'none' 
                 }}
-                className={`relative text-left w-full sm:w-[320px] max-w-[340px] rounded-[1.5rem] border-2 bg-[#0a0a0a] flex flex-col min-h-[440px] group overflow-hidden transition-all duration-500 hover:-translate-y-2 ${isDisabled ? (isLocked ? 'opacity-70' : 'opacity-50 grayscale') : ''}`}
+                className="relative text-left w-full sm:w-[320px] max-w-[340px] rounded-[1.5rem] border-2 bg-[#0a0a0a] flex flex-col min-h-[440px] overflow-hidden opacity-40 grayscale pointer-events-none select-none"
               >
+                {/* SOLD OUT Overlay */}
+                <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60">
+                  <span className="font-sans font-black italic text-2xl uppercase tracking-widest text-white/40 -rotate-12 border-4 border-white/20 px-6 py-2">SOLD OUT</span>
+                </div>
+
                 {/* Event Badge Top Bar */}
                 <div className="h-10 flex justify-between items-center px-5 z-20" style={{ backgroundColor: `${hex}1A`, color: hex }}>
                   <span className="font-mono text-[9px] font-bold uppercase tracking-widest">ACCESS PASS</span>
@@ -96,9 +94,7 @@ export const TicketsSection = () => {
                 <div className="absolute top-2.5 left-1/2 -translate-x-1/2 w-10 h-2.5 rounded-full bg-[#050505] shadow-[inset_0_2px_4px_rgba(0,0,0,0.8)] z-30" />
 
                 <div className="p-5 flex-1 flex flex-col relative z-20">
-                  {/* Header Area (symmetric height for title & price) */}
                   <div className="h-[150px] flex flex-col justify-between mb-4">
-                    {/* Status & Name */}
                     <div className="flex justify-between items-start ">
                       <div>
                         <p className="font-mono text-[10px] tracking-widest uppercase mb-1 font-bold" style={{ color: hex }}>
@@ -108,30 +104,14 @@ export const TicketsSection = () => {
                           {tier.name}
                         </h3>
                       </div>
-                      
-                      {(!registrationEnabled || isLocked || label) && (
-                        <div 
-                          className="font-mono text-[8px] tracking-widest uppercase px-2 py-1 border rounded-sm text-center shrink-0"
-                          style={!registrationEnabled ? { 
-                            color: '#00ffff', 
-                            borderColor: '#00ffff4D', 
-                            backgroundColor: '#00ffff1A' 
-                          } : isLocked ? {
-                            color: '#f59e0b',
-                            borderColor: '#f59e0b4D',
-                            backgroundColor: '#f59e0b1A'
-                          } : {
-                            color: hex, 
-                            borderColor: `${hex}4D`, 
-                            backgroundColor: `${hex}1A` 
-                          }}
-                        >
-                          {!registrationEnabled ? "UPCOMING" : isLocked ? "Opening Soon" : label}
-                        </div>
-                      )}
+                      <div 
+                        className="font-mono text-[8px] tracking-widest uppercase px-2 py-1 border rounded-sm text-center shrink-0"
+                        style={{ color: '#ef4444', borderColor: '#ef44444D', backgroundColor: '#ef44441A' }}
+                      >
+                        SOLD OUT
+                      </div>
                     </div>
 
-                    {/* Price */}
                     <div className="flex items-baseline gap-1 mt-5">
                       <span className="font-sans font-bold text-lg text-white/40">₹</span>
                       <span className="font-sans font-black italic text-4xl tracking-tighter text-white">
@@ -149,7 +129,7 @@ export const TicketsSection = () => {
                   {/* Features List */}
                   <ul className="flex flex-col gap-2 flex-1 mt-5">
                     {tier.perks && tier.perks.map((feature, j) => (
-                      <li key={j} className="text-[11px] font-sans text-white/70 flex items-start gap-2 group-hover:text-white/90 transition-colors">
+                      <li key={j} className="text-[11px] font-sans text-white/70 flex items-start gap-2">
                         <Check size={12} className="shrink-0 mt-0.5" style={{ color: hex }} />
                         <span className="leading-snug">{feature}</span>
                       </li>
@@ -158,34 +138,14 @@ export const TicketsSection = () => {
 
                   {/* Bottom Action Section */}
                   <div className="mt-6 pt-5 border-t border-white/10">
-                    {registrationEnabled && !isDisabled ? (
-                      <Link
-                        to={`/ticket?passId=${tier.id}`}
-                        style={{ backgroundColor: hex, color: '#000', boxShadow: `0 10px 15px -3px ${hex}33` }}
-                        className="w-full text-center px-4 py-3.5 text-[11px] font-mono uppercase tracking-widest font-bold transition-all skew-x-[-6deg] block hover:bg-white hover:text-black"
-                      >
-                        <span className="skew-x-[6deg] block">Secure Pass →</span>
-                      </Link>
-                    ) : (
-                      <button type="button"
-                        disabled
-                        className="w-full text-center px-4 py-3.5 text-[11px] font-mono uppercase tracking-widest font-bold bg-white/5 text-white/20 skew-x-[-6deg] block cursor-not-allowed"
-                      >
-                        <span className="skew-x-[6deg] block">
-                          {!registrationEnabled ? "Opening Soon" : isLocked ? "Coming Soon" : "Grid Full"}
-                        </span>
-                      </button>
-                    )}
+                    <button type="button"
+                      disabled
+                      className="w-full text-center px-4 py-3.5 text-[11px] font-mono uppercase tracking-widest font-bold bg-white/5 text-white/20 skew-x-[-6deg] block cursor-not-allowed"
+                    >
+                      <span className="skew-x-[6deg] block">Sold Out</span>
+                    </button>
                   </div>
                 </div>
-
-                {/* Hover Glow Effect */}
-                {!isDisabled && (
-                  <div 
-                    className="absolute top-0 left-0 right-0 h-32 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none"
-                    style={{ background: `linear-gradient(to bottom, ${hex}33, transparent)` }}
-                  />
-                )}
               </motion.div>
             );
           })}
