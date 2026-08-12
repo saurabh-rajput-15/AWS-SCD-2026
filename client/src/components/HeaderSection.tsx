@@ -115,7 +115,7 @@ export const HeaderSection = () => {
         <NoticeMarquee />
       </div>
 
-      <header className="h-14 sm:h-16 lg:h-20 flex items-center justify-between px-4 sm:px-12 lg:px-24 z-[9999] fixed top-[34px] sm:top-[38px] left-0 right-0 transition-all duration-300">
+      <header className="h-14 sm:h-16 lg:h-20 flex items-center justify-between px-4 sm:px-12 lg:px-24 z-[9999] fixed top-[29px] left-0 right-0 transition-all duration-300">
         {/* Dissolving Glass Backdrop */}
         <div 
           className="absolute inset-0 -z-10 bg-black/60 backdrop-blur-2xl border-b border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
