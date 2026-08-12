@@ -192,6 +192,11 @@ export function RegistrationsTable() {
                     }`}>
                       {r.payment_status}
                     </span>
+                    {r.orders?.payments?.[0]?.gateway_response?.received_by && (
+                      <span className="block text-[9px] text-aws-orange font-mono font-bold mt-0.5 truncate max-w-[110px]">
+                        By: {r.orders.payments[0].gateway_response.received_by}
+                      </span>
+                    )}
                   </td>
                   <td className="py-2 px-3 text-center">
                     {r.checked_in ? (

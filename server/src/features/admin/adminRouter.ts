@@ -314,7 +314,7 @@ router.get('/registrations', async (req, res, next) => {
 
     let query = supabase
       .from('registrations')
-      .select('*, pass_types(name, badge_color), orders(primary_email, quantity)', { count: 'exact' })
+      .select('*, pass_types(name, badge_color), orders(primary_email, quantity, payments(gateway_response))', { count: 'exact' })
       .order('created_at', { ascending: false })
       .range(from, to);
 
@@ -348,17 +348,22 @@ router.get('/export-csv', async (_req, res, next) => {
   try {
     const { data, error } = await supabase
       .from('registrations')
-      .select('ticket_number, pass_slug, full_name, email, phone, role, organization, payment_status, checked_in, checked_in_at, created_at')
+      .select('ticket_number, pass_slug, full_name, email, phone, role, organization, payment_status, checked_in, checked_in_at, created_at, orders(payments(gateway_response))')
       .order('created_at', { ascending: false });
 
     if (error) throw error;
 
-    const headers = 'ticket_number,pass_type,full_name,email,phone,role,organization,payment_status,checked_in,checked_in_at,created_at';
-    const rows = (data || []).map((r) =>
-      [r.ticket_number, r.pass_slug, r.full_name, r.email, r.phone || '', r.role, r.organization, r.payment_status, r.checked_in, r.checked_in_at || '', r.created_at]
+    const headers = 'ticket_number,pass_type,full_name,email,phone,role,organization,payment_status,received_by,checked_in,checked_in_at,created_at';
+    const rows = (data || []).map((r: any) => {
+      const payments = r.orders?.payments || [];
+      const receivedBy = payments[0]?.gateway_response?.received_by || (payments[0]?.gateway_response?.offline ? 'Offline' : 'Online PG');
+      return [
+        r.ticket_number, r.pass_slug, r.full_name, r.email, r.phone || '', r.role, 
+        r.organization, r.payment_status, receivedBy, r.checked_in, r.checked_in_at || '', r.created_at
+      ]
         .map((v) => `"${String(v).replace(/"/g, '""')}"`)
-        .join(',')
-    );
+        .join(',');
+    });
 
     const csv = [headers, ...rows].join('\n');
     const date = new Date().toISOString().split('T')[0];

@@ -120,10 +120,27 @@ export function RegistrationForm({ selectedPass, initialAttendees, verifiedEmail
     // eslint-disable-next-line react-hooks/exhaustive-deps, react-doctor/exhaustive-deps
   }, [attendees]);
 
+const sanitizePhone = (val: string): string => {
+  let str = val.trim();
+  if (str.startsWith('+91')) {
+    str = str.slice(3);
+  } else if (str.startsWith('0')) {
+    str = str.slice(1);
+  }
+  let digits = str.replace(/\D/g, '');
+  if (digits.length === 12 && digits.startsWith('91')) {
+    digits = digits.slice(2);
+  } else if (digits.length === 11 && digits.startsWith('0')) {
+    digits = digits.slice(1);
+  }
+  return digits.slice(0, 10);
+};
+
   const updateField = (index: number, field: keyof AttendeeData, value: string) => {
+    const val = field === 'phone' ? sanitizePhone(value) : value;
     setAttendees(prev => {
       const next = [...prev];
-      next[index] = { ...next[index], [field]: value };
+      next[index] = { ...next[index], [field]: val };
       return next;
     });
     if (fieldErrors[index]?.[field]) {
@@ -429,7 +446,6 @@ export function RegistrationForm({ selectedPass, initialAttendees, verifiedEmail
                   value={attendee.phone}
                   onChange={(e) => updateField(index, 'phone', e.target.value)}
                   className="w-full min-w-0 bg-[#111] border border-white/10 px-4 py-2 text-sm text-white focus:border-aws-orange focus:outline-none"
-                  maxLength={10}
                 />
                 {fieldErrors[index]?.phone && (
                   <p className="text-f1-red text-[10px] font-mono mt-1">{fieldErrors[index].phone}</p>

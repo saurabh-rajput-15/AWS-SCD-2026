@@ -21,6 +21,22 @@ interface FormData {
   received_by: string;
 }
 
+const sanitizePhone = (val: string): string => {
+  let str = val.trim();
+  if (str.startsWith('+91')) {
+    str = str.slice(3);
+  } else if (str.startsWith('0')) {
+    str = str.slice(1);
+  }
+  let digits = str.replace(/\D/g, '');
+  if (digits.length === 12 && digits.startsWith('91')) {
+    digits = digits.slice(2);
+  } else if (digits.length === 11 && digits.startsWith('0')) {
+    digits = digits.slice(1);
+  }
+  return digits.slice(0, 10);
+};
+
 const initialForm: FormData = {
   pass_type_id: '',
   full_name: '',
@@ -283,7 +299,7 @@ export function OfflinePassGenerator() {
             <input
               type="tel"
               value={form.phone}
-              onChange={e => setForm(f => ({ ...f, phone: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
+              onChange={e => setForm(f => ({ ...f, phone: sanitizePhone(e.target.value) }))}
               placeholder="9876543210"
               className="w-full h-10 bg-white/5 border border-white/10 rounded px-3 font-mono text-xs text-white placeholder:text-white/20 focus:border-aws-orange/50 focus:outline-none transition-colors"
             />
