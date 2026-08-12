@@ -934,5 +934,140 @@ router.get('/referral-details', async (_req, res, next) => {
   }
 });
 
+// POST /api/admin/generate-pass — create an offline registration and send the pass
+router.post('/generate-pass', async (req, res, next) => {
+  try {
+    const { pass_type_id, full_name, email, phone, role, organization, received_by } = req.body;
+
+    // Validate required fields
+    if (!pass_type_id || !full_name || !email || !phone || !role || !organization) {
+      res.status(400).json({ error: 'All fields are required: pass_type_id, full_name, email, phone, role, organization' });
+      return;
+    }
+
+    const collectorName = (received_by || 'Organizer').trim();
+
+    if (!/^[0-9]{10}$/.test(phone)) {
+      res.status(400).json({ error: 'Phone must be a 10-digit number' });
+      return;
+    }
+
+    if (!['student', 'professional'].includes(role)) {
+      res.status(400).json({ error: 'Role must be "student" or "professional"' });
+      return;
+    }
+
+    // Validate pass type exists
+    const { data: passType, error: ptErr } = await supabase
+      .from('pass_types')
+      .select('id, price, slug, capacity, sold')
+      .eq('id', pass_type_id)
+      .single();
+
+    if (ptErr || !passType) {
+      res.status(404).json({ error: 'Pass type not found' });
+      return;
+    }
+
+    // Check for duplicate: same email + same pass type already PAID
+    const { data: existingReg } = await supabase
+      .from('registrations')
+      .select('id, ticket_number')
+      .eq('email', email.toLowerCase().trim())
+      .eq('payment_status', 'PAID')
+      .limit(1)
+      .single();
+
+    if (existingReg) {
+      res.status(409).json({
+        error: 'DUPLICATE',
+        message: `This email already has a paid registration (Ticket: ${existingReg.ticket_number || 'N/A'})`,
+      });
+      return;
+    }
+
+    // Create order (offline: total_amount = 0, discount = full price since paid offline)
+    const { data: order, error: orderErr } = await supabase
+      .from('orders')
+      .insert({
+        pass_type_id,
+        quantity: 1,
+        subtotal: passType.price,
+        discount: passType.price,
+        total_amount: 0,
+        payment_status: 'PAID',
+        primary_email: email.toLowerCase().trim(),
+      })
+      .select('id')
+      .single();
+
+    if (orderErr) throw orderErr;
+
+    // Create registration
+    const { error: regErr } = await supabase
+      .from('registrations')
+      .insert({
+        order_id: order.id,
+        pass_type_id,
+        pass_slug: passType.slug,
+        full_name: full_name.trim(),
+        email: email.toLowerCase().trim(),
+        phone,
+        role,
+        organization: organization.trim(),
+        payment_status: 'PAID',
+        is_primary: true,
+      });
+
+    if (regErr) throw regErr;
+
+    // Create payment record with status 'initiated' so fulfillOrder can claim it and issue ticket + email
+    const offlinePaymentId = `OFFLINE-${order.id.split('-')[0]}-${Date.now()}`;
+    const { error: payErr } = await supabase
+      .from('payments')
+      .insert({
+        order_id: order.id,
+        cashfree_order_id: offlinePaymentId,
+        amount: 0,
+        status: 'initiated',
+      });
+
+    if (payErr) throw payErr;
+
+    // Reserve ticket in inventory
+    await supabase.rpc('reserve_tickets', { p_pass_id: pass_type_id, p_amount: 1 });
+
+    // fulfillOrder claims payment status (initiated -> paid), assigns ticket_number, qr_token, referral code, and enqueues confirmation email
+    const { fulfillOrder } = await import('../../shared/lib/fulfillOrder.js');
+    const result = await fulfillOrder(offlinePaymentId, {
+      gatewayResponse: { offline: true, note: 'Admin-generated offline pass', received_by: collectorName },
+    });
+
+    // Fetch the generated ticket details
+    const { data: reg } = await supabase
+      .from('registrations')
+      .select('id, ticket_number, full_name, email, phone, role, organization')
+      .eq('order_id', order.id)
+      .single();
+
+    res.status(201).json({
+      success: true,
+      order_id: order.id,
+      registration_id: reg?.id || order.id,
+      ticket_number: reg?.ticket_number || 'N/A',
+      full_name: reg?.full_name || full_name,
+      email: reg?.email || email,
+      phone: reg?.phone || phone,
+      role: reg?.role || role,
+      organization: reg?.organization || organization,
+      pass_name: passType.slug,
+      received_by: collectorName,
+      fulfillment: result,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
 

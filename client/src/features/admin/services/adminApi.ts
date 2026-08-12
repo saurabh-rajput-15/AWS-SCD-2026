@@ -69,4 +69,14 @@ export const adminApi = {
 
   sendShoutout: (data: { mimeMessage: string }) =>
     api.post('/api/admin/shoutout', data, { headers: getHeaders() }),
+
+  generateOfflinePass: (data: {
+    pass_type_id: string;
+    full_name: string;
+    email: string;
+    phone: string;
+    role: string;
+    organization: string;
+    received_by?: string;
+  }) => api.post('/api/admin/generate-pass', data, { headers: getHeaders() }),
 };

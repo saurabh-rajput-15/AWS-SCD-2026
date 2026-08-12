@@ -16,13 +16,15 @@ import { MpdTable } from '../components/MpdTable';
 import { AdminSettings } from '../components/AdminSettings';
 import { PromoCodesManager } from '../components/PromoCodesManager';
 import { ReferralLeaderboard } from '../components/ReferralLeaderboard';
-import { Mic, Handshake, Building2, Settings, Tag, UserCheck, Gift } from 'lucide-react';
+import { OfflinePassGenerator } from '../components/OfflinePassGenerator';
+import { Mic, Handshake, Building2, Settings, Tag, UserCheck, Gift, UserPlus } from 'lucide-react';
 
-type Tab = 'overview' | 'passes' | 'promo' | 'referrals' | 'registrations' | 'speakers' | 'partners' | 'sponsors' | 'volunteers' | 'mpd' | 'shoutout' | 'export' | 'settings';
+type Tab = 'overview' | 'passes' | 'generate-pass' | 'promo' | 'referrals' | 'registrations' | 'speakers' | 'partners' | 'sponsors' | 'volunteers' | 'mpd' | 'shoutout' | 'export' | 'settings';
 
 const navItems: Array<{ key: Tab; label: string; icon: any }> = [
   { key: 'overview', label: 'Overview', icon: BarChart3 },
   { key: 'passes', label: 'Pass Types', icon: Ticket },
+  { key: 'generate-pass', label: 'Generate Pass', icon: UserPlus },
   { key: 'promo', label: 'Promo Codes', icon: Tag },
   { key: 'referrals', label: 'Referrals', icon: Gift },
   { key: 'registrations', label: 'Registrations', icon: Users },
@@ -150,6 +152,7 @@ export function AdminPage() {
         {/* Content */}
         {activeTab === 'overview' && <TelemetryCards />}
         {activeTab === 'passes' && <PassTypesManager />}
+        {activeTab === 'generate-pass' && <OfflinePassGenerator />}
         {activeTab === 'promo' && <PromoCodesManager />}
         {activeTab === 'referrals' && <ReferralLeaderboard />}
         {activeTab === 'registrations' && <RegistrationsTable />}
