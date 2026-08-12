@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Loader2, CreditCard } from 'lucide-react';
+import { Loader2, CreditCard, AlertCircle, Phone, Mail } from 'lucide-react';
 import type { PassType } from '../hooks/usePassTypes';
 
 interface Props {
@@ -39,8 +39,40 @@ export function PaymentEmbed({ selectedPass, loading, error, onInitiatePayment, 
       </div>
 
       {error && (
-        <div className="p-3 mb-6 border border-f1-red/30 bg-f1-red/10 text-f1-red text-xs font-mono">
-          {error}
+        <div className="p-5 mb-6 border border-aws-orange/40 bg-gradient-to-br from-f1-red/20 via-black to-f1-red/10 rounded-xl text-left shadow-xl">
+          <div className="flex items-start gap-3 mb-3">
+            <AlertCircle size={24} className="text-aws-orange shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-sans font-black italic text-base sm:text-lg uppercase tracking-tight text-white">
+                Digital Passes Currently Sold Out Online
+              </h3>
+              <p className="font-mono text-xs text-white/80 mt-1 leading-relaxed">
+                Digital passes are currently sold out online for a moment. Please contact the organizers for possible physical passes as physical passes are limited!
+              </p>
+            </div>
+          </div>
+
+          <div className="p-4 bg-black/60 border border-white/10 rounded-lg font-mono text-xs space-y-2">
+            <p className="text-aws-orange font-bold uppercase tracking-wider text-[11px]">Contact Organizers for Pass Enquiries:</p>
+            <div className="text-white/80 space-y-1.5 pt-1">
+              <p className="flex items-center justify-between">
+                <span>Soham Chaudhari:</span>
+                <a href="tel:+919834382337" className="text-aws-orange hover:underline font-bold flex items-center gap-1"><Phone size={12} /> +91 98343 82337</a>
+              </p>
+              <p className="flex items-center justify-between">
+                <span>Vaibhav Chaudhari:</span>
+                <a href="tel:+918007298092" className="text-aws-orange hover:underline font-bold flex items-center gap-1"><Phone size={12} /> +91 80072 98092</a>
+              </p>
+              <p className="flex items-center justify-between">
+                <span>Saurabh Rajput:</span>
+                <a href="tel:+919890991510" className="text-aws-orange hover:underline font-bold flex items-center gap-1"><Phone size={12} /> +91 98909 91510</a>
+              </p>
+              <p className="pt-2 border-t border-white/10 flex items-center justify-between">
+                <span>Email Support:</span>
+                <a href="mailto:info@aws-scd-dhule.tech" className="text-aws-orange hover:underline font-bold flex items-center gap-1"><Mail size={12} /> info@aws-scd-dhule.tech</a>
+              </p>
+            </div>
+          </div>
         </div>
       )}
 

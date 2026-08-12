@@ -1,5 +1,5 @@
 import { motion } from 'motion/react';
-import { Check } from 'lucide-react';
+import { Check, AlertCircle, Phone, Mail } from 'lucide-react';
 import type { PassType } from '../hooks/usePassTypes';
 import { Skeleton } from 'boneyard-js/react';
 
@@ -29,6 +29,27 @@ export function PassTypeSelector({ passes, loading, onSelect }: Props) {
 
   return (
     <Skeleton name="pass-type-selector" loading={loading}>
+      {/* Notice Banner */}
+      <div className="p-4 mb-6 bg-f1-red/10 border border-aws-orange/30 rounded-lg text-left">
+        <div className="flex items-start gap-3">
+          <AlertCircle size={20} className="text-aws-orange shrink-0 mt-0.5" />
+          <div className="space-y-1">
+            <p className="font-sans font-bold text-xs uppercase tracking-wider text-white">
+              Digital passes sold out online for a moment
+            </p>
+            <p className="font-mono text-[11px] text-white/70">
+              Contact organizers for possible physical passes as passes are limited!
+            </p>
+            <div className="pt-2 flex flex-wrap gap-x-4 gap-y-1 font-mono text-[11px] text-aws-orange">
+              <a href="tel:+919834382337" className="hover:underline flex items-center gap-1"><Phone size={10} /> Soham: +91 98343 82337</a>
+              <a href="tel:+918007298092" className="hover:underline flex items-center gap-1"><Phone size={10} /> Vaibhav: +91 80072 98092</a>
+              <a href="tel:+919890991510" className="hover:underline flex items-center gap-1"><Phone size={10} /> Saurabh: +91 98909 91510</a>
+              <a href="mailto:info@aws-scd-dhule.tech" className="hover:underline flex items-center gap-1"><Mail size={10} /> info@aws-scd-dhule.tech</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="flex flex-wrap justify-center gap-4 items-stretch">
         {displayPasses.map((pass, i) => {
           const soldOut = pass.available <= 0;

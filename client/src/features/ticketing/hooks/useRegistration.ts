@@ -220,11 +220,19 @@ export function useRegistration() {
 
       cashfree.checkout(checkoutOptions).then((result: any) => {
         if (result.error) {
-          setState((s) => ({ ...s, loading: false, error: result.error.message || 'Payment failed' }));
+          const rawErr = result.error.message || 'Payment failed';
+          const friendlyErr = rawErr.toLowerCase().includes('transactions are not enabled') || rawErr.toLowerCase().includes('payment gateway')
+            ? 'Digital passes are currently sold out online for a moment. Contact organizers for possible physical passes as passes are limited.'
+            : rawErr;
+          setState((s) => ({ ...s, loading: false, error: friendlyErr }));
         }
       });
     } catch (err: any) {
-      setState((s) => ({ ...s, loading: false, error: err.response?.data?.message || 'Payment initiation failed' }));
+      const rawErr = err.response?.data?.message || err.message || 'Payment initiation failed';
+      const friendlyErr = rawErr.toLowerCase().includes('transactions are not enabled') || rawErr.toLowerCase().includes('payment gateway')
+        ? 'Digital passes are currently sold out online for a moment. Contact organizers for possible physical passes as passes are limited.'
+        : rawErr;
+      setState((s) => ({ ...s, loading: false, error: friendlyErr }));
     }
   }, [state.order, state.selectedPass, restoreOrder]);
 

@@ -76,11 +76,34 @@ export function TicketsPurchasePage() {
   if (!registrationEnabled) {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4">
-        <AlertCircle size={48} className="text-f1-red mb-4" />
-        <h1 className="font-sans font-black italic text-3xl sm:text-4xl uppercase tracking-tight mb-2 text-center">Registrations Closed</h1>
-        <p className="text-white/50 font-mono text-sm mb-8 text-center max-w-md">
-          Ticket registrations are currently paused or haven't opened yet. Please check back later.
+        <AlertCircle size={48} className="text-aws-orange mb-4" />
+        <h1 className="font-sans font-black italic text-3xl sm:text-4xl uppercase tracking-tight mb-2 text-center">Digital Passes Sold Out</h1>
+        <p className="text-white/60 font-mono text-sm mb-6 text-center max-w-lg leading-relaxed">
+          Online digital passes are currently sold out for a moment. Contact organizers for possible physical passes as passes are limited!
         </p>
+
+        <div className="w-full max-w-md p-5 bg-white/5 border border-white/10 rounded-xl mb-8">
+          <p className="font-mono text-[11px] text-aws-orange font-bold uppercase tracking-wider mb-3">Pass Inquiry Contacts:</p>
+          <div className="space-y-2 font-mono text-xs text-white/80">
+            <p className="flex items-center justify-between">
+              <span>Soham Chaudhari</span>
+              <a href="tel:+919834382337" className="text-aws-orange hover:underline font-bold">+91 98343 82337</a>
+            </p>
+            <p className="flex items-center justify-between">
+              <span>Vaibhav Chaudhari</span>
+              <a href="tel:+918007298092" className="text-aws-orange hover:underline font-bold">+91 80072 98092</a>
+            </p>
+            <p className="flex items-center justify-between">
+              <span>Saurabh Rajput</span>
+              <a href="tel:+919890991510" className="text-aws-orange hover:underline font-bold">+91 98909 91510</a>
+            </p>
+            <p className="pt-2 border-t border-white/10 flex items-center justify-between">
+              <span>Email</span>
+              <a href="mailto:info@aws-scd-dhule.tech" className="text-aws-orange hover:underline font-bold">info@aws-scd-dhule.tech</a>
+            </p>
+          </div>
+        </div>
+
         <Link to="/" className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors font-mono text-xs uppercase tracking-widest border border-white/20 text-white hover:text-white">
           Return to Home
         </Link>

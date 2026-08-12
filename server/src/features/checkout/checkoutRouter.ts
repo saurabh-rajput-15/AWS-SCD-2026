@@ -182,7 +182,7 @@ router.post('/initiate', checkoutLimiter, async (req, res, next) => {
       res.status(502).json({ 
         error: 'Payment gateway error', 
         details: cashfreeData,
-        message: cashfreeData?.message || 'Unknown Cashfree Error'
+        message: 'Digital passes are currently sold out online for a moment. Contact organizers for possible physical passes as passes are limited.'
       });
       return;
     }
