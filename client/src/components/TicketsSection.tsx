@@ -77,11 +77,15 @@ export const TicketsSection = () => {
                   borderColor: '#ffffff0D', 
                   boxShadow: 'none' 
                 }}
-                className="relative text-left w-full sm:w-[320px] max-w-[340px] rounded-[1.5rem] border-2 bg-[#0a0a0a] flex flex-col min-h-[440px] overflow-hidden opacity-40 grayscale pointer-events-none select-none"
+                className="relative text-left w-full sm:w-[320px] max-w-[340px] rounded-[1.5rem] border-2 bg-[#0a0a0a] flex flex-col min-h-[440px] overflow-hidden opacity-75 pointer-events-none select-none"
               >
-                {/* SOLD OUT Overlay */}
-                <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60">
-                  <span className="font-sans font-black italic text-2xl uppercase tracking-widest text-white/40 -rotate-12 border-4 border-white/20 px-6 py-2">SOLD OUT</span>
+                {/* Simple Static Red SOLD OUT Stamp */}
+                <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/70 backdrop-blur-[1px]">
+                  <div className="-rotate-12 px-6 py-2.5 border-4 border-red-500 rounded-xl bg-red-950/90 shadow-[0_0_25px_rgba(239,68,68,0.5)] text-center">
+                    <span className="font-sans font-black italic text-2xl sm:text-3xl uppercase tracking-widest text-red-500 drop-shadow-[0_2px_10px_rgba(239,68,68,0.8)] block">
+                      SOLD OUT
+                    </span>
+                  </div>
                 </div>
 
                 {/* Event Badge Top Bar */}
