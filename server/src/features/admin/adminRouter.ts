@@ -619,26 +619,247 @@ router.post('/passes', async (req, res, next) => {
 // POST /api/admin/shoutout
 router.post('/shoutout', async (req, res, next) => {
   try {
-    const { mimeMessage } = req.body;
-    
-    if (!mimeMessage) {
-      res.status(400).json({ error: 'mimeMessage is required' });
+    const {
+      mimeMessage,
+      subject,
+      html,
+      recipientSource = 'csv',
+      recipients = [],
+      provider = 'mailtrap',
+    } = req.body;
+
+    // 1. Resolve content (either from mimeMessage or direct fields)
+    let finalSubject = subject || '';
+    let finalHtml = html || '';
+    let finalFrom = '';
+    let finalReplyTo = '';
+
+    if (mimeMessage && typeof mimeMessage === 'string') {
+      const lines = mimeMessage.split(/\r?\n/);
+      for (const line of lines) {
+        if (!finalSubject && line.toLowerCase().startsWith('subject:')) {
+          finalSubject = line.substring(8).trim();
+        }
+        if (!finalFrom && line.toLowerCase().startsWith('from:')) {
+          finalFrom = line.substring(5).trim();
+        }
+        if (!finalReplyTo && line.toLowerCase().startsWith('reply-to:')) {
+          finalReplyTo = line.substring(9).trim();
+        }
+      }
+
+      if (!finalHtml) {
+        const htmlRegex = /(<html[\s\S]*<\/html>|<body[\s\S]*<\/body>|<div[\s\S]*<\/div>)/i;
+        const match = mimeMessage.match(htmlRegex);
+        finalHtml = match && match[1] ? match[1] : mimeMessage;
+      }
+    }
+
+    if (!finalSubject) {
+      finalSubject = 'Important Announcement — AWS Student Community Day Dhule 2026';
+    }
+
+    if (!finalHtml || !finalHtml.trim()) {
+      res.status(400).json({ error: 'Email message content (HTML or MIME payload) is required' });
       return;
     }
 
-    // Since SES is pending, we'll just log the intent to the server console.
-    // In the future, we will fetch all emails and use AWS SES SendRawEmailCommand.
-    console.log('[Admin Shoutout] Mock sending broadcast. Received MIME payload:');
-    console.log('----------------------------------------------------');
-    console.log(mimeMessage);
-    console.log('----------------------------------------------------');
-    console.log('[Admin Shoutout] Note: Email dispatch is stubbed out for now.');
+    // 2. Resolve recipients
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let targetRecipients: Array<{ email: string; name: string }> = [];
 
-    res.status(200).json({ success: true, message: 'Shoutout queued successfully (stubbed)' });
+    if (recipientSource === 'csv' || (Array.isArray(recipients) && recipients.length > 0)) {
+      const seen = new Set<string>();
+      for (const r of recipients) {
+        const email = (r?.email || '').trim().toLowerCase();
+        if (email && emailRegex.test(email) && !seen.has(email)) {
+          seen.add(email);
+          targetRecipients.push({
+            email,
+            name: (r.name || '').trim() || email.split('@')[0],
+          });
+        }
+      }
+    } else if (recipientSource === 'database_paid') {
+      const regs = await fetchAll((from, to) =>
+        supabase
+          .from('registrations')
+          .select('email, full_name')
+          .eq('payment_status', 'PAID')
+          .range(from, to)
+      );
+      const seen = new Set<string>();
+      for (const r of regs || []) {
+        const email = (r.email || '').trim().toLowerCase();
+        if (email && emailRegex.test(email) && !seen.has(email)) {
+          seen.add(email);
+          targetRecipients.push({
+            email,
+            name: (r.full_name || '').trim() || email.split('@')[0],
+          });
+        }
+      }
+    } else if (recipientSource === 'database_all') {
+      const regs = await fetchAll((from, to) =>
+        supabase.from('registrations').select('email, full_name').range(from, to)
+      );
+      const seen = new Set<string>();
+      for (const r of regs || []) {
+        const email = (r.email || '').trim().toLowerCase();
+        if (email && emailRegex.test(email) && !seen.has(email)) {
+          seen.add(email);
+          targetRecipients.push({
+            email,
+            name: (r.full_name || '').trim() || email.split('@')[0],
+          });
+        }
+      }
+    } else if (recipientSource === 'database_all_contacts') {
+      const [regs, volunteers, speakers, mpds, sponsors, partners] = await Promise.all([
+        fetchAll((from, to) => supabase.from('registrations').select('email, full_name').range(from, to)),
+        fetchAll((from, to) => supabase.from('volunteer_applications').select('email, full_name').range(from, to)),
+        fetchAll((from, to) => supabase.from('speaker_applications').select('email, full_name').range(from, to)),
+        fetchAll((from, to) => supabase.from('mpd_applications').select('email, full_name').range(from, to)),
+        fetchAll((from, to) => supabase.from('sponsor_applications').select('email, contact').range(from, to)),
+        fetchAll((from, to) => supabase.from('community_partners').select('organizer_email, organizer_name').range(from, to)),
+      ]);
+
+      const seen = new Set<string>();
+      const add = (email?: string, name?: string) => {
+        const em = (email || '').trim().toLowerCase();
+        if (em && emailRegex.test(em) && !seen.has(em)) {
+          seen.add(em);
+          targetRecipients.push({
+            email: em,
+            name: (name || '').trim() || em.split('@')[0],
+          });
+        }
+      };
+
+      (regs || []).forEach((r) => add(r.email, r.full_name));
+      (volunteers || []).forEach((r) => add(r.email, r.full_name));
+      (speakers || []).forEach((r) => add(r.email, r.full_name));
+      (mpds || []).forEach((r) => add(r.email, r.full_name));
+      (sponsors || []).forEach((r) => add(r.email, r.contact));
+      (partners || []).forEach((r) => add(r.organizer_email, r.organizer_name));
+    }
+
+    if (targetRecipients.length === 0) {
+      res.status(400).json({ error: 'No valid recipients found to send broadcast to.' });
+      return;
+    }
+
+    // 3. Initialize Mailtrap Email Provider
+    const { getEmailProvider } = await import('../../shared/lib/emailProvider.js');
+    let emailProviderInstance;
+    try {
+      emailProviderInstance = getEmailProvider(provider || 'mailtrap');
+    } catch (providerErr: any) {
+      res.status(400).json({
+        error: 'EMAIL_PROVIDER_ERROR',
+        message: providerErr.message || 'Failed to initialize email provider',
+      });
+      return;
+    }
+
+    console.log(`[Admin Shoutout] Starting broadcast to ${targetRecipients.length} recipients via ${emailProviderInstance.name}`);
+
+    // 4. Batch Dispatch
+    const BATCH_CONCURRENCY = 5;
+    let sentCount = 0;
+    let failedCount = 0;
+    const failures: Array<{ email: string; error: string }> = [];
+
+    for (let i = 0; i < targetRecipients.length; i += BATCH_CONCURRENCY) {
+      const batch = targetRecipients.slice(i, i + BATCH_CONCURRENCY);
+      await Promise.all(
+        batch.map(async (recipient) => {
+          try {
+            // Replace template variables
+            const personalizedSubject = finalSubject
+              .replace(/\{\{attendee_name\}\}/gi, recipient.name)
+              .replace(/\{\{name\}\}/gi, recipient.name)
+              .replace(/\{\{recipient_name\}\}/gi, recipient.name)
+              .replace(/\{\{attendee_email\}\}/gi, recipient.email)
+              .replace(/\{\{email\}\}/gi, recipient.email)
+              .replace(/\{\{event_name\}\}/gi, 'AWS Student Community Day Dhule 2026')
+              .replace(/\{\{event_date\}\}/gi, '14 August 2026')
+              .replace(/\{\{event_venue\}\}/gi, "SVKM's Institute of Technology, Dhule");
+
+            const personalizedHtml = finalHtml
+              .replace(/\{\{attendee_name\}\}/gi, recipient.name)
+              .replace(/\{\{name\}\}/gi, recipient.name)
+              .replace(/\{\{recipient_name\}\}/gi, recipient.name)
+              .replace(/\{\{attendee_email\}\}/gi, recipient.email)
+              .replace(/\{\{email\}\}/gi, recipient.email)
+              .replace(/\{\{event_name\}\}/gi, 'AWS Student Community Day Dhule 2026')
+              .replace(/\{\{event_date\}\}/gi, '14 August 2026')
+              .replace(/\{\{event_venue\}\}/gi, "SVKM's Institute of Technology, Dhule");
+
+            const result = await emailProviderInstance.send({
+              to: recipient.email,
+              subject: personalizedSubject,
+              html: personalizedHtml,
+              from: finalFrom || undefined,
+              replyTo: finalReplyTo || undefined,
+            });
+
+            sentCount++;
+
+            // Audit record in email_jobs / email_logs
+            try {
+              const idempotencyKey = `broadcast:${Date.now()}:${recipient.email}:${Math.random().toString(36).substring(2, 7)}`;
+              const { data: job } = await supabase
+                .from('email_jobs')
+                .insert({
+                  idempotency_key: idempotencyKey,
+                  email_type: 'broadcast',
+                  recipient_email: recipient.email,
+                  recipient_name: recipient.name,
+                  subject: personalizedSubject,
+                  html_body: '',
+                  status: 'sent',
+                  provider_message_id: result.messageId,
+                  sent_at: new Date().toISOString(),
+                })
+                .select('id')
+                .single();
+
+              if (job) {
+                await supabase.from('email_logs').insert({
+                  email_job_id: job.id,
+                  provider: emailProviderInstance.name,
+                  status: 'success',
+                  provider_message_id: result.messageId,
+                });
+              }
+            } catch {
+              // Ignore logging errors to not block broadcast delivery
+            }
+          } catch (sendErr: any) {
+            failedCount++;
+            const errMsg = sendErr?.message || String(sendErr);
+            failures.push({ email: recipient.email, error: errMsg });
+            console.error(`[Admin Shoutout] Failed sending to ${recipient.email}:`, errMsg);
+          }
+        })
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      provider: emailProviderInstance.name,
+      total: targetRecipients.length,
+      sent: sentCount,
+      failed: failedCount,
+      failures: failures.slice(0, 50),
+      message: `Broadcast finished: ${sentCount} sent, ${failedCount} failed out of ${targetRecipients.length} recipients.`,
+    });
   } catch (err) {
     next(err);
   }
 });
+
 
 // GET /api/admin/speakers
 router.get('/speakers', async (req, res, next) => {

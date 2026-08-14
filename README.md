@@ -120,10 +120,11 @@ QR_HMAC_SECRET=your-secure-qr-hmac-hash-key
 ADMIN_SECRET=your-admin-page-password
 SCANNER_SECRET=your-scanner-passcode
 
-# Email Provider Configuration (Resend or AWS SES)
-EMAIL_PROVIDER=resend             # Use "resend" or "ses"
+# Email Provider Configuration (Resend, Mailtrap, or AWS SES)
+EMAIL_PROVIDER=resend             # Use "resend", "mailtrap", or "ses"
 EMAIL_FROM=no-reply@yourdomain.com
 RESEND_API_KEY=your-resend-api-key
+MAILTRAP_API_KEY=your-mailtrap-api-key # Used for OTP and Admin Broadcast Emails
 
 # If using AWS SES:
 AWS_SES_REGION=ap-south-1

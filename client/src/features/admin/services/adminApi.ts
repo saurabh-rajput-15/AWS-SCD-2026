@@ -67,8 +67,14 @@ export const adminApi = {
   getReferralDetails: () =>
     api.get('/api/admin/referral-details', { headers: getHeaders() }),
 
-  sendShoutout: (data: { mimeMessage: string }) =>
-    api.post('/api/admin/shoutout', data, { headers: getHeaders() }),
+  sendShoutout: (data: {
+    mimeMessage?: string;
+    subject?: string;
+    html?: string;
+    recipientSource?: 'csv' | 'database_all' | 'database_paid' | 'database_all_contacts';
+    recipients?: Array<{ email: string; name?: string }>;
+    provider?: 'mailtrap' | 'resend';
+  }) => api.post('/api/admin/shoutout', data, { headers: getHeaders() }),
 
   generateOfflinePass: (data: {
     pass_type_id: string;
