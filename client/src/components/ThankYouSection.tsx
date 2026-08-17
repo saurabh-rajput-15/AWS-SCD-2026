@@ -1,5 +1,6 @@
 import { motion } from 'motion/react';
-import { MessageCircle, ExternalLink } from 'lucide-react';
+import { MessageCircle, ExternalLink, Award } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 export const ThankYouSection = () => {
   return (
@@ -38,8 +39,8 @@ export const ThankYouSection = () => {
           To all our attendees, speakers, sponsors, volunteers, and the vibrant developer community — thank you for making <span className="text-white font-bold">AWS SCD Dhule 2026</span> unforgettable!
         </p>
 
-        {/* WhatsApp Community Button */}
-        <div className="mt-8">
+        {/* Action Buttons */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
           <a
             href="https://chat.whatsapp.com/KsMTV60oG2kBuaoofwQdxJ"
             target="_blank"
@@ -50,6 +51,14 @@ export const ThankYouSection = () => {
             <span>Join Our WhatsApp Community</span>
             <ExternalLink size={14} className="group-hover:translate-x-0.5 transition-transform" />
           </a>
+
+          <Link
+            to="/certificate"
+            className="inline-flex items-center gap-2.5 px-6 py-3.5 bg-aws-orange hover:bg-white text-black font-sans font-black italic uppercase text-xs sm:text-sm tracking-wider rounded-lg shadow-[0_0_25px_rgba(255,153,0,0.35)] transition-all hover:scale-105 group cursor-pointer"
+          >
+            <Award size={18} className="text-black" />
+            <span>Claim Your Certificate</span>
+          </Link>
         </div>
 
         {/* Community Tag */}

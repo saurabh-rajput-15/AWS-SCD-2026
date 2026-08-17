@@ -7,6 +7,7 @@ const navLinks = [
   { label: 'About', href: '#about' },
   { label: 'Speakers', href: '#speakers' },
   { label: 'Agenda', href: '#schedule' },
+  { label: 'Certificate', href: '/certificate' },
   { label: 'Feedback', href: '/feedback' },
   { label: 'Sponsors', href: '#sponsors' },
   { label: 'Merch Store', href: '#store' },
@@ -80,7 +81,7 @@ export const HeaderSection = () => {
         />
         <div className="flex items-center sm:gap-4 shrink-0">
           <Link to="/">
-            <img src="/scd-dhule-logo.png?v=4" alt="SCD Dhule" className="w-28 sm:w-36 lg:w-44 h-auto max-h-16 sm:max-h-20 lg:max-h-24 object-contain" fetchPriority="high" />
+            <img src="/scd-dhule-logo.png" alt="SCD Dhule" className="w-28 sm:w-36 lg:w-44 h-auto max-h-16 sm:max-h-20 lg:max-h-24 object-contain py-2 px-4" fetchPriority="high" />
           </Link>
         </div>
 

@@ -34,6 +34,7 @@ const SponsorPage = lazy(() => import('./components/SponsorPage').then(module =>
 const NotFoundPage = lazy(() => import('./components/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
 const StatusPage = lazy(() => import('./components/StatusPage').then(module => ({ default: module.StatusPage })));
 const BadgePage = lazy(() => import('./components/BadgePage').then(module => ({ default: module.BadgePage })));
+const CertificatePage = lazy(() => import('./components/CertificatePage').then(module => ({ default: module.CertificatePage })));
 const CodeOfConductPage = lazy(() => import('./components/CodeOfConductPage').then(module => ({ default: module.CodeOfConductPage })));
 import { BackToTop } from './components/BackToTop';
 import { CustomCursor } from './components/CustomCursor';
@@ -130,6 +131,8 @@ export default function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/status" element={<StatusPage />} />
         <Route path="/badge" element={<BadgePage />} />
+        <Route path="/certificate" element={<CertificatePage />} />
+        <Route path="/cert" element={<CertificatePage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/codeofconduct" element={<CodeOfConductPage />} />
         <Route path="*" element={<NotFoundPage />} />

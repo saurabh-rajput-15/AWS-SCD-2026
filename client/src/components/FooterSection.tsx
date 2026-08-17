@@ -5,13 +5,14 @@ const quickLinks = [
   { label: 'About', href: '#about' },
   { label: 'Agenda', href: '#schedule' },
   { label: 'Speakers', href: '#speakers' },
+  { label: 'Certificate', href: '/certificate' },
   { label: 'Feedback Form', href: '/feedback' },
   { label: 'Merch Store', href: '#store' },
   { label: 'Sponsors', href: '#sponsors' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Refer & Win', href: '/refertowin' },
-  { label: 'Volunteer', href: '/volunteer' },
   { label: 'Badge', href: '/badge' },
+  { label: 'Volunteer', href: '/volunteer' },
   { label: 'Code of Conduct', href: '/codeofconduct' },
 ];
 

@@ -109,9 +109,9 @@ export const BadgePage = () => {
                 <div className="absolute top-0 left-0 w-full h-[70px] bg-[#050505] z-30 flex justify-between items-center px-5 border-b border-white/10 shadow-md">
                   {/* Left Logo */}
                   <img
-                    src="/scd-dhule-logo.png?v=4"
+                    src="/scd-dhule-logo.png"
                     alt="SCD Dhule"
-                    className="h-20 sm:h-11 w-auto max-w-[220px] object-contain"
+                    className="h-20 sm:h-11 w-auto max-w-[220px] object-contain py-2 px-4"
                     crossOrigin="anonymous"
                   />
                   {/* Right Logos - Single Line */}
