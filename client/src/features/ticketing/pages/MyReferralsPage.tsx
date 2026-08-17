@@ -6,13 +6,14 @@ import {
   Search, 
   Copy, 
   Check, 
-  Share2, 
   Mail, 
-  Calendar, 
-  Gift, 
-  ExternalLink, 
   Loader2,
-  Trophy
+  Trophy,
+  Award,
+  Sparkles,
+  CheckCircle2,
+  Medal,
+  Crown
 } from 'lucide-react';
 import { api } from '../../../lib/api';
 import copy from 'copy-to-clipboard';
@@ -32,6 +33,7 @@ interface ReferralResponse {
   referral_count: number;
   referrals: ReferralRecord[];
 }
+
 export default function MyReferralsPage() {
   interface PublicLeaderboardEntry {
     name: string;
@@ -51,6 +53,19 @@ export default function MyReferralsPage() {
   const [leaderboard, setLeaderboard] = useState<PublicLeaderboardEntry[]>([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
 
+  // Initial celebratory confetti
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FF9900', '#E10600', '#ffffff', '#10B981', '#FFD700']
+      });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
@@ -63,8 +78,6 @@ export default function MyReferralsPage() {
       }
     };
     fetchLeaderboard();
-    const interval = setInterval(fetchLeaderboard, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   const handleSearch = async (e: React.FormEvent) => {
@@ -80,12 +93,12 @@ export default function MyReferralsPage() {
       });
       setData(res.data);
       
-      // Theme matched confetti: AWS Orange, F1 Red, White, Green
+      // Theme matched confetti: AWS Orange, F1 Red, White, Green, Gold
       confetti({
-        particleCount: 80,
-        spread: 60,
+        particleCount: 90,
+        spread: 65,
         origin: { y: 0.75 },
-        colors: ['#FF9900', '#E10600', '#ffffff', '#10B981']
+        colors: ['#FF9900', '#E10600', '#ffffff', '#10B981', '#FFD700']
       });
     } catch (err: any) {
       console.error(err);
@@ -116,12 +129,6 @@ export default function MyReferralsPage() {
     setTimeout(() => setCopiedCode(false), 2000);
   };
 
-  const shareText = `Hey! I just registered for AWS Student Community Day Dhule 2026. Use my referral link to get your pass and let's meet on the grid! 🏁 ${referralUrl}`;
-
-  const shareWhatsApp = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-  const shareTwitter = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-  const shareLinkedIn = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(referralUrl)}`;
-
   const formatDate = (dateStr: string) => {
     try {
       const date = new Date(dateStr);
@@ -135,6 +142,13 @@ export default function MyReferralsPage() {
       return dateStr;
     }
   };
+
+  // Verified Final Top 5 from Leaderboard
+  const top1 = leaderboard[0] || { name: 'Dnyaneshwar Mali', total_points: 225, referrals: 9 };
+  const top2 = leaderboard[1] || { name: 'Yuvraj Patil', total_points: 150, referrals: 6 };
+  const top3 = leaderboard[2] || { name: 'Shaikh Shaarif', total_points: 150, referrals: 2 };
+  const top4 = leaderboard[3] || { name: 'Om Jadhav', total_points: 125, referrals: 5 };
+  const top5 = leaderboard[4] || { name: 'Srushti Dashpute', total_points: 125, referrals: 5 };
 
   return (
     <div className="min-h-screen w-full bg-[#050505] text-white flex flex-col relative no-scrollbar">
@@ -220,148 +234,7 @@ export default function MyReferralsPage() {
         ))}
       </div>
 
-      {/* Floating F1 Standing HUD */}
-      <aside className="fixed top-24 left-6 z-20 w-80 bg-[#0c0c12]/95 border border-white/10 rounded-lg overflow-hidden shadow-2xl backdrop-blur-md hidden lg:flex flex-col font-sans">
-        {/* HUD Header */}
-        <div className="bg-[#08080c] px-4 py-3.5 border-b border-white/5 flex items-center justify-between">
-          <span className="font-sans font-black italic text-sm text-white tracking-wider uppercase">
-            Leaderboard
-          </span>
-          {leaderboard.length > 0 && (
-            <span className="font-mono text-xs text-aws-orange bg-aws-orange/10 px-2.5 py-0.5 rounded border border-aws-orange/20 font-bold">
-              {leaderboard.length} Referrers
-            </span>
-          )}
-        </div>
-
-        {/* Fixed Top 5 Leaders (UNSCROLLABLE) */}
-        <div className="p-3.5 pb-2.5 space-y-2">
-          <div className="font-mono text-[10px] text-white/40 uppercase tracking-[0.2em] mb-1 font-semibold flex items-center justify-between">
-            <span>Top 5 Leaders</span>
-            <span className="text-aws-orange text-[9px] font-bold">P1 - P5</span>
-          </div>
-          {leaderboardLoading ? (
-            <div className="flex items-center justify-center py-6">
-              <Loader2 className="animate-spin text-aws-orange" size={16} />
-            </div>
-          ) : leaderboard.length === 0 ? (
-            <div className="text-center py-6 px-3 border border-white/5 border-dashed rounded font-mono text-xs text-white/40 leading-relaxed">
-              Grid forming... <br />
-              <span className="text-aws-orange font-sans font-bold italic uppercase mt-1 inline-block">Be the first to claim P1!</span>
-            </div>
-          ) : (
-            leaderboard.slice(0, 5).map((entry, index) => {
-              const isLeader = index === 0;
-              const nameSizeClass = index === 0 ? 'text-[13.5px]' : (index === 1 || index === 2) ? 'text-[12px]' : 'text-[10.5px]';
-              const pointsSizeClass = index === 0 ? 'text-[16px]' : (index === 1 || index === 2) ? 'text-[14px]' : 'text-[12.5px]';
-              
-              const nameHoverColor = isLeader ? 'group-hover:text-[#E10600]' : 'group-hover:text-aws-orange';
-              const pointsColorClass = isLeader ? 'text-[#E10600]' : 'text-aws-orange';
-              const pointsGlowClass = isLeader ? 'group-hover:drop-shadow-[0_0_6px_rgba(225,6,0,0.6)]' : 'group-hover:drop-shadow-[0_0_6px_rgba(255,153,0,0.5)]';
-
-              return (
-                <div 
-                  key={index} 
-                  className="group flex items-center bg-[#0e0e13]/85 hover:bg-[#161622]/90 border border-white/5 hover:border-aws-orange/20 rounded-sm overflow-hidden h-9.5 transition-all duration-300 hover:translate-x-1"
-                >
-                  <div 
-                    className={`w-8 h-full flex items-center justify-center font-mono text-sm font-black select-none transition-colors duration-300 ${
-                      isLeader ? 'bg-[#E10600] group-hover:bg-[#ff0a00] text-white' : 'bg-zinc-800 group-hover:bg-zinc-700 text-white/70 group-hover:text-white'
-                    }`}
-                  >
-                    {index + 1}
-                  </div>
-                  <div 
-                    className={`w-1 h-full transition-transform duration-300 group-hover:scale-y-110 ${
-                      isLeader 
-                        ? 'bg-[#E10600]'
-                        : entry.pass?.toLowerCase().includes('vip') 
-                          ? 'bg-emerald-500' 
-                          : 'bg-aws-orange'
-                    }`} 
-                  />
-                  <div className="flex-1 px-3 flex items-center justify-between min-w-0 h-full bg-chequered bg-chequered-hover transition-all duration-300">
-                    <span className={`font-sans font-black italic uppercase tracking-wider text-white/95 truncate transition-colors duration-300 ${nameSizeClass} ${nameHoverColor}`}>
-                      {entry.name}
-                    </span>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <span className={`font-mono font-black group-hover:text-white transition-all duration-300 group-hover:scale-110 ${pointsSizeClass} ${pointsColorClass} ${pointsGlowClass}`}>
-                        {entry.total_points}
-                      </span>
-                      <span className="font-mono text-[9px] font-bold text-white/40 group-hover:text-white/70 transition-colors duration-300">PTS</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })
-          )}
-
-          {/* Standings Slots Padding */}
-          {!leaderboardLoading && leaderboard.length < 5 && Array.from({ length: 5 - leaderboard.length }).map((_, i) => {
-            const pos = leaderboard.length + i + 1;
-            return (
-              <div 
-                key={pos} 
-                className="flex items-center bg-[#0a0a0c]/30 border border-white/5 border-dashed rounded-sm h-9.5 opacity-35 select-none"
-              >
-                <div className="w-8 h-full flex items-center justify-center font-mono text-sm font-bold bg-white/5 text-white/20">
-                  {pos}
-                </div>
-                <div className="w-1 h-full bg-white/10" />
-                <div className="flex-1 pl-3 font-mono text-[9px] text-white/20 uppercase tracking-wider">
-                  Grid Slot Open
-                </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Rest of Grid P6+ (SCROLLABLE) */}
-        {!leaderboardLoading && leaderboard.length > 5 && (
-          <div className="border-t border-white/5 p-3.5 pt-2.5 space-y-2 max-h-56 custom-scrollbar bg-[#08080d]/60">
-            <div className="font-mono text-[10px] text-white/40 uppercase tracking-[0.2em] mb-1 font-semibold flex items-center justify-between">
-              <span>Rest of Grid</span>
-              <span className="text-white/30 text-[9px]">Scroll ↓</span>
-            </div>
-            {leaderboard.slice(5).map((entry, index) => {
-              const actualRank = index + 6;
-              return (
-                <div 
-                  key={actualRank} 
-                  className="group flex items-center bg-[#0e0e13]/70 hover:bg-[#161622]/90 border border-white/5 hover:border-aws-orange/20 rounded-sm overflow-hidden h-9 transition-all duration-300 hover:translate-x-1"
-                >
-                  <div className="w-8 h-full flex items-center justify-center font-mono text-xs font-black select-none bg-zinc-800/80 group-hover:bg-zinc-700 text-white/60 group-hover:text-white">
-                    {actualRank}
-                  </div>
-                  <div className={`w-1 h-full ${entry.pass?.toLowerCase().includes('vip') ? 'bg-emerald-500' : 'bg-aws-orange'}`} />
-                  <div className="flex-1 px-3 flex items-center justify-between min-w-0 h-full bg-chequered bg-chequered-hover transition-all duration-300">
-                    <span className="font-sans font-black italic uppercase tracking-wider text-white/80 group-hover:text-aws-orange text-[10.5px] truncate">
-                      {entry.name}
-                    </span>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <span className="font-mono font-black text-aws-orange text-[12.5px]">
-                        {entry.total_points}
-                      </span>
-                      <span className="font-mono text-[9px] font-bold text-white/40">PTS</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
-
-        {/* Live Broadcast HUD Footer */}
-        <div className="px-4 py-3 border-t border-white/5 bg-[#08080c]/50 flex items-center justify-between font-mono text-[9px] text-white/50 uppercase tracking-widest font-semibold">
-          <span>GP: DHULE 2026</span>
-          <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#E10600] animate-pulse" />
-            <span>LIVE</span>
-          </div>
-        </div>
-      </aside>
-
-      {/* Right Column: Main Refer & Win Content (No padding left, keeping content perfectly centered) */}
+      {/* Main Content Area */}
       <div className="w-full flex-1 flex flex-col relative z-10">
         {/* Header Navigation */}
         <header className="border-b border-white/5 bg-[#0a0a0a]/60 backdrop-blur-md px-4 sm:px-12 py-4 flex items-center justify-between">
@@ -377,23 +250,147 @@ export default function MyReferralsPage() {
           </span>
         </header>
 
-        {/* Form & Action Center */}
-        <div className="w-full flex-1 px-4 sm:px-12 py-10 flex flex-col items-center justify-start">
+        {/* Main Winners Stage & Results Center */}
+        <div className="w-full flex-1 px-4 sm:px-12 py-8 sm:py-12 flex flex-col items-center justify-start max-w-6xl mx-auto">
+          
+          {/* Contest Concluded Status Badge */}
+          <div className="flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-full font-mono text-[10px] sm:text-xs text-emerald-400 font-bold uppercase tracking-widest mb-4 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>CONTEST CONCLUDED • FINAL PODIUM</span>
+          </div>
+
           {/* Title */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center p-3 bg-aws-orange/10 rounded-full border border-aws-orange/20 mb-4 animate-pulse">
-              <Gift className="text-aws-orange w-6 h-6" />
-            </div>
-            <h1 className="font-sans font-black italic text-4xl sm:text-6xl uppercase tracking-tighter mb-2 text-white">
-              REFER & <span className="text-aws-orange drop-shadow-[0_0_15px_rgba(255,153,0,0.3)]">WIN</span>
+          <div className="text-center mb-10 max-w-2xl mx-auto">
+            <h1 className="font-sans font-black italic text-4xl sm:text-6xl uppercase tracking-tighter mb-3 text-white">
+              REFER & <span className="text-aws-orange drop-shadow-[0_0_25px_rgba(255,153,0,0.5)]">WINNERS</span>
             </h1>
-            <p className="text-white/50 font-mono text-xs uppercase tracking-wider max-w-md mx-auto">
-              Check your referral points, get your code, and share with friends to win prizes.
+            <p className="text-white/60 font-mono text-xs sm:text-sm uppercase tracking-wider max-w-xl mx-auto leading-relaxed">
+              The chequered flag has dropped! Huge congratulations to our Top 5 community builders who brought the crowd to the grid!
             </p>
           </div>
 
-          {/* Lookup Card */}
-          <div className="w-full max-w-md bg-[#0d0d0d]/80 border border-white/5 rounded-2xl p-6 sm:p-8 mb-8 shadow-xl backdrop-blur-md">
+          {/* Top 3 Podium Cards */}
+          <div className="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 items-end">
+            
+            {/* P2 (Silver) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              className="order-2 md:order-1 relative bg-gradient-to-b from-[#181822] via-[#0f0f16] to-[#08080c] border border-slate-400/30 rounded-2xl p-6 text-center shadow-xl overflow-hidden group hover:border-slate-300/60 transition-all"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-slate-400 to-slate-200" />
+              <div className="w-12 h-12 mx-auto rounded-full bg-slate-400/10 border border-slate-400/40 flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(148,163,184,0.2)]">
+                <span className="font-mono font-black text-xl text-slate-300">2</span>
+              </div>
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-slate-300 font-bold block mb-1">
+                🥈 2nd Place Podium
+              </span>
+              <h3 className="font-sans font-black italic text-xl text-white uppercase tracking-tight mb-2 truncate">
+                {top2.name}
+              </h3>
+              <div className="font-mono font-black text-2xl text-slate-200 mb-1">
+                {top2.total_points} <span className="text-xs text-slate-400 font-normal">PTS</span>
+              </div>
+              <p className="font-mono text-[10px] text-white/40 uppercase">{top2.referrals} Referrals Completed</p>
+            </motion.div>
+
+            {/* P1 (Gold Champion) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="order-1 md:order-2 relative bg-gradient-to-b from-[#2a1a05] via-[#1a1104] to-[#0a0702] border-2 border-aws-orange/60 rounded-2xl p-7 text-center shadow-[0_0_40px_rgba(255,153,0,0.25)] overflow-hidden group -mt-4"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#FFD700] via-aws-orange to-[#E10600]" />
+              <div className="w-16 h-16 mx-auto rounded-full bg-aws-orange/20 border-2 border-aws-orange flex items-center justify-center mb-3 shadow-[0_0_25px_rgba(255,153,0,0.5)]">
+                <Trophy className="text-aws-orange w-8 h-8 drop-shadow-[0_0_10px_rgba(255,153,0,0.8)]" />
+              </div>
+              <span className="px-3 py-0.5 rounded-full bg-aws-orange/20 border border-aws-orange/50 font-mono text-[10px] uppercase tracking-[0.25em] text-aws-orange font-black inline-block mb-1.5">
+                👑 1st Place Champion
+              </span>
+              <h3 className="font-sans font-black italic text-2xl sm:text-3xl text-white uppercase tracking-tight mb-2 truncate">
+                {top1.name}
+              </h3>
+              <div className="font-mono font-black text-4xl text-aws-orange mb-1 drop-shadow-[0_0_15px_rgba(255,153,0,0.4)]">
+                {top1.total_points} <span className="text-sm text-white/50 font-normal">PTS</span>
+              </div>
+              <p className="font-mono text-xs text-white/60 uppercase font-semibold">{top1.referrals} Referrals Completed</p>
+            </motion.div>
+
+            {/* P3 (Bronze) */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="order-3 relative bg-gradient-to-b from-[#1f1510] via-[#140d0a] to-[#080504] border border-amber-700/40 rounded-2xl p-6 text-center shadow-xl overflow-hidden group hover:border-amber-600/60 transition-all"
+            >
+              <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-700 to-amber-500" />
+              <div className="w-12 h-12 mx-auto rounded-full bg-amber-700/10 border border-amber-700/40 flex items-center justify-center mb-3 shadow-[0_0_15px_rgba(217,119,6,0.2)]">
+                <span className="font-mono font-black text-xl text-amber-500">3</span>
+              </div>
+              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-amber-500 font-bold block mb-1">
+                🥉 3rd Place Podium
+              </span>
+              <h3 className="font-sans font-black italic text-xl text-white uppercase tracking-tight mb-2 truncate">
+                {top3.name}
+              </h3>
+              <div className="font-mono font-black text-2xl text-amber-400 mb-1">
+                {top3.total_points} <span className="text-xs text-amber-500/70 font-normal">PTS</span>
+              </div>
+              <p className="font-mono text-[10px] text-white/40 uppercase">{top3.referrals} Referrals Completed</p>
+            </motion.div>
+
+          </div>
+
+          {/* P4 & P5 Cards (Top 5 Finishes) */}
+          <div className="w-full max-w-4xl grid grid-cols-1 sm:grid-cols-2 gap-4 mb-12">
+            <div className="bg-[#0e0e14] border border-white/10 rounded-xl p-5 flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center font-mono font-black text-sm text-white/80">
+                  4
+                </div>
+                <div>
+                  <span className="font-mono text-[9px] uppercase text-white/40 tracking-wider block font-semibold">🎖️ 4th Place Finalist</span>
+                  <h4 className="font-sans font-black italic uppercase text-lg text-white">{top4.name}</h4>
+                </div>
+              </div>
+              <div className="text-right font-mono">
+                <div className="text-xl font-black text-aws-orange">{top4.total_points} <span className="text-[10px] text-white/40 font-normal">PTS</span></div>
+                <div className="text-[10px] text-white/40 uppercase">{top4.referrals} Referrals</div>
+              </div>
+            </div>
+
+            <div className="bg-[#0e0e14] border border-white/10 rounded-xl p-5 flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-3.5">
+                <div className="w-10 h-10 rounded-lg bg-zinc-800 border border-white/10 flex items-center justify-center font-mono font-black text-sm text-white/80">
+                  5
+                </div>
+                <div>
+                  <span className="font-mono text-[9px] uppercase text-white/40 tracking-wider block font-semibold">🎖️ 5th Place Finalist</span>
+                  <h4 className="font-sans font-black italic uppercase text-lg text-white truncate max-w-[170px] sm:max-w-[200px]">
+                    {top5.name}
+                  </h4>
+                </div>
+              </div>
+              <div className="text-right font-mono">
+                <div className="text-xl font-black text-aws-orange">{top5.total_points} <span className="text-[10px] text-white/40 font-normal">PTS</span></div>
+                <div className="text-[10px] text-white/40 uppercase">{top5.referrals} Referrals</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Individual Participant Lookup Card */}
+          <div className="w-full max-w-md bg-[#0d0d0d]/90 border border-white/10 rounded-2xl p-6 sm:p-8 mb-12 shadow-xl backdrop-blur-md">
+            <div className="text-center mb-5">
+              <span className="font-mono text-[10px] text-aws-orange uppercase tracking-[0.2em] font-bold block mb-1">
+                Participant Results
+              </span>
+              <h3 className="font-sans font-black italic text-lg uppercase tracking-tight text-white">
+                Check Your Final Points
+              </h3>
+            </div>
+
             <form onSubmit={handleSearch} className="space-y-4">
               <div>
                 <label htmlFor="email" className="block font-mono text-xs text-white/50 uppercase tracking-[0.2em] mb-2 font-semibold">
@@ -403,7 +400,7 @@ export default function MyReferralsPage() {
                   <input
                     type="email"
                     id="email"
-                    placeholder="Enter registered email address"
+                    placeholder="Enter your registered email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="w-full bg-[#050505] border border-white/10 rounded-lg px-4 py-3 pl-11 font-mono text-sm text-white placeholder-white/20 focus:outline-none focus:border-aws-orange focus:ring-1 focus:ring-aws-orange transition-colors"
@@ -420,12 +417,12 @@ export default function MyReferralsPage() {
                 {loading ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    Searching...
+                    Searching Results...
                   </>
                 ) : (
                   <>
                     <Search size={16} />
-                    Check Points
+                    View Final Tally
                   </>
                 )}
               </button>
@@ -447,111 +444,44 @@ export default function MyReferralsPage() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
-                className="w-full space-y-8"
+                className="w-full space-y-8 mb-12"
               >
                 {/* Scoreboard Cards */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto w-full">
                   <div className="bg-gradient-to-br from-[#111]/80 to-[#0a0a0a]/80 border border-white/5 rounded-2xl p-6 text-center shadow-lg relative overflow-hidden backdrop-blur-sm">
-                    <p className="font-mono text-xs text-white/50 uppercase tracking-[0.2em] mb-1 font-semibold">Total Points</p>
+                    <p className="font-mono text-xs text-white/50 uppercase tracking-[0.2em] mb-1 font-semibold">Total Verified Points</p>
                     <p className="font-sans font-black italic text-5xl text-emerald-400">{data.total_points}</p>
-                    <p className="font-mono text-[10px] text-white/30 uppercase mt-2">25 PTS per ticket</p>
+                    <p className="font-mono text-[10px] text-white/30 uppercase mt-2">25 PTS per attendee</p>
                   </div>
                   <div className="bg-gradient-to-br from-[#111]/80 to-[#0a0a0a]/80 border border-white/5 rounded-2xl p-6 text-center shadow-lg relative overflow-hidden backdrop-blur-sm">
-                    <p className="font-mono text-xs text-white/50 uppercase tracking-[0.2em] mb-1 font-semibold">Referral Count</p>
+                    <p className="font-mono text-xs text-white/50 uppercase tracking-[0.2em] mb-1 font-semibold">Total Referrals</p>
                     <p className="font-sans font-black italic text-5xl text-aws-orange">{data.referral_count}</p>
                     <p className="font-mono text-[10px] text-white/30 uppercase mt-2">Friends registered</p>
                   </div>
                 </div>
 
-                {/* Referral Code & Social Sharing */}
-                <div className="max-w-2xl mx-auto w-full bg-gradient-to-br from-[#1a1a2e]/90 to-[#16213e]/90 border border-aws-orange/20 rounded-2xl p-6 sm:p-8 shadow-xl backdrop-blur-md">
-                  <h3 className="font-sans font-black italic text-lg uppercase tracking-tight text-aws-orange mb-3 text-center sm:text-left">
-                    Share & Earn Rewards
-                  </h3>
-                  <p className="font-mono text-xs text-white/60 mb-6 leading-relaxed text-center sm:text-left">
-                    Share your link with colleagues, students, or tech communities. They choose their own paddock passes, and you receive points!
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-stretch">
-                    {/* Left Column: Code and Copy Link */}
-                    <div className="space-y-4 flex flex-col justify-between">
-                      {/* Raw Code Click box */}
-                      <div 
-                        onClick={handleCopyCode}
-                        className="bg-[#050505] border border-dashed border-aws-orange/40 rounded-xl p-4 cursor-pointer hover:bg-aws-orange/[0.03] transition-colors text-center relative group"
-                        title="Click to copy raw code"
-                      >
-                        <p className="font-mono text-[10px] text-white/40 uppercase tracking-[0.2em] mb-1 font-semibold">
-                          {copiedCode ? "Code Copied!" : "Your Referral Code (Click to Copy)"}
-                        </p>
-                        <p className="font-mono text-3xl font-bold text-aws-orange tracking-[0.3em]">
-                          {data.referral_code}
-                        </p>
-                      </div>
-
-                      {/* Copy Link Button */}
-                      <button
-                        type="button"
-                        onClick={handleCopyLink}
-                        className={`w-full inline-flex items-center justify-center gap-2 py-3.5 text-xs font-mono uppercase tracking-widest font-bold transition-all cursor-pointer rounded-lg border ${
-                          copiedLink
-                            ? 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                            : 'bg-white/5 border-white/10 text-white/80 hover:bg-white/10 hover:text-white'
-                        }`}
-                      >
-                        {copiedLink ? <Check size={14} /> : <Copy size={14} />}
-                        {copiedLink ? 'Copied!' : 'Copy Link'}
-                      </button>
-                    </div>
-
-                    {/* Right Column: Social Shares */}
-                    <div className="bg-[#050505]/40 border border-white/5 rounded-xl p-5 flex flex-col justify-between">
-                      <p className="font-mono text-[10px] text-white/40 uppercase tracking-[0.2em] mb-4 text-center font-semibold">
-                        Quick Share Shortcuts
-                      </p>
-
-                      <div className="space-y-3">
-                        <a
-                          href={shareWhatsApp}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="w-full flex items-center justify-center gap-2 bg-[#25D366] text-black font-bold py-2.5 rounded-lg text-xs font-mono uppercase tracking-wider hover:opacity-90 transition-opacity"
-                        >
-                          Share on WhatsApp
-                        </a>
-
-                        <a
-                          href={shareTwitter}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="w-full flex items-center justify-center gap-2 bg-white text-black font-bold py-2.5 rounded-lg text-xs font-mono uppercase tracking-wider hover:opacity-90 transition-opacity"
-                        >
-                          Share on X (Twitter)
-                        </a>
-
-                        <a
-                          href={shareLinkedIn}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="w-full flex items-center justify-center gap-2 bg-[#0A66C2] text-white font-bold py-2.5 rounded-lg text-xs font-mono uppercase tracking-wider hover:opacity-90 transition-opacity"
-                        >
-                          Share on LinkedIn
-                        </a>
-                      </div>
-                    </div>
+                {/* Campaign Concluded Note for User */}
+                <div className="max-w-2xl mx-auto w-full bg-gradient-to-br from-[#12121a] to-[#0a0a10] border border-white/10 rounded-2xl p-6 shadow-xl text-center">
+                  <div className="inline-flex items-center justify-center p-2.5 bg-emerald-500/10 rounded-full border border-emerald-500/30 text-emerald-400 mb-3">
+                    <CheckCircle2 size={20} />
                   </div>
+                  <h4 className="font-sans font-black italic text-lg uppercase text-white mb-2">
+                    Thank You For Participating!
+                  </h4>
+                  <p className="font-mono text-xs text-white/60 leading-relaxed max-w-md mx-auto">
+                    Your referral code was <span className="text-aws-orange font-bold font-mono">{data.referral_code}</span>. All points and referrals are locked and recorded for official event awards and swag distribution.
+                  </p>
                 </div>
 
                 {/* Referral History List */}
                 <div className="max-w-2xl mx-auto w-full bg-[#0d0d0d]/80 border border-white/5 rounded-2xl p-6 sm:p-8 shadow-xl backdrop-blur-md overflow-hidden">
                   <h3 className="font-sans font-black italic text-lg uppercase tracking-tight text-white mb-6">
-                    Referral Transactions
+                    Referral Breakdown
                   </h3>
 
                   {data.referrals.length === 0 ? (
                     <div className="text-center py-10 border border-white/5 border-dashed rounded-xl">
-                      <p className="font-mono text-xs text-white/40 uppercase tracking-widest">No successful referrals yet</p>
-                      <p className="font-mono text-[10px] text-white/30 uppercase tracking-widest mt-1">Share your link to unlock points!</p>
+                      <p className="font-mono text-xs text-white/40 uppercase tracking-widest">No referrals recorded on this pass</p>
                     </div>
                   ) : (
                     <div className="overflow-x-auto max-h-64 no-scrollbar">
@@ -581,143 +511,123 @@ export default function MyReferralsPage() {
               </motion.div>
             )}
           </AnimatePresence>
-        </div>
 
-        {/* Mobile Leaderboard (visible only below lg breakpoint) */}
-        <div className="lg:hidden px-4 sm:px-12 pb-8">
-          <div className="bg-[#0c0c12]/95 border border-white/10 rounded-lg overflow-hidden shadow-2xl backdrop-blur-md font-sans">
-            <div className="bg-[#08080c] px-4 py-3.5 border-b border-white/5 flex items-center justify-between">
-              <span className="font-sans font-black italic text-sm text-white tracking-wider uppercase">
-                Leaderboard
-              </span>
+          {/* Full Final Standings Grid (Bottom Leaderboard) */}
+          <div className="w-full max-w-4xl bg-[#0c0c12]/95 border border-white/10 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md font-sans mb-6">
+            {/* HUD Header */}
+            <div className="bg-[#08080c] px-5 py-4 border-b border-white/5 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <Trophy size={18} className="text-aws-orange" />
+                <span className="font-sans font-black italic text-base sm:text-lg text-white tracking-wider uppercase">
+                  Final Standings & Complete Grid
+                </span>
+              </div>
               <div className="flex items-center gap-2">
                 {leaderboard.length > 0 && (
-                  <span className="font-mono text-xs text-aws-orange bg-aws-orange/10 px-2 py-0.5 rounded border border-aws-orange/20 font-bold">
+                  <span className="font-mono text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded border border-emerald-500/20 font-bold uppercase">
                     {leaderboard.length} Referrers
                   </span>
                 )}
                 <div className="flex items-center gap-1.5 ml-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#E10600] animate-pulse" />
-                  <span className="font-mono text-[9px] text-white/40 uppercase tracking-widest font-semibold">LIVE</span>
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span className="font-mono text-[10px] text-emerald-400 uppercase tracking-widest font-semibold">CONCLUDED</span>
                 </div>
               </div>
             </div>
 
-            {/* Fixed Top 5 Leaders (UNSCROLLABLE) */}
-            <div className="p-3.5 space-y-2">
-              <div className="font-mono text-[10px] text-white/40 uppercase tracking-[0.2em] mb-1 font-semibold flex items-center justify-between">
-                <span>Top 5 Leaders</span>
-                <span className="text-aws-orange text-[9px] font-bold">P1 - P5</span>
+            {/* Leaderboard Rows */}
+            <div className="p-4 sm:p-6 space-y-2.5">
+              <div className="font-mono text-[11px] text-white/40 uppercase tracking-[0.2em] mb-2 font-semibold flex items-center justify-between">
+                <span>Leaderboard Ranks</span>
+                <span className="text-aws-orange text-[10px] font-bold">ALL PARTICIPANTS</span>
               </div>
+
               {leaderboardLoading ? (
-                <div className="flex items-center justify-center py-6">
-                  <Loader2 className="animate-spin text-aws-orange" size={16} />
-                </div>
-              ) : leaderboard.length === 0 ? (
-                <div className="text-center py-6 px-3 border border-white/5 border-dashed rounded font-mono text-xs text-white/40 leading-relaxed">
-                  Grid forming... <br />
-                  <span className="text-aws-orange font-sans font-bold italic uppercase mt-1 inline-block">Be the first to claim P1!</span>
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="animate-spin text-aws-orange" size={24} />
                 </div>
               ) : (
-                leaderboard.slice(0, 5).map((entry, index) => {
-                  const isLeader = index === 0;
-                  const nameSizeClass = index === 0 ? 'text-[13.5px]' : (index === 1 || index === 2) ? 'text-[12px]' : 'text-[10.5px]';
-                  const pointsSizeClass = index === 0 ? 'text-[16px]' : (index === 1 || index === 2) ? 'text-[14px]' : 'text-[12.5px]';
-                  
-                  const nameHoverColor = isLeader ? 'group-hover:text-[#E10600]' : 'group-hover:text-aws-orange';
-                  const pointsColorClass = isLeader ? 'text-[#E10600]' : 'text-aws-orange';
-                  const pointsGlowClass = isLeader ? 'group-hover:drop-shadow-[0_0_6px_rgba(225,6,0,0.6)]' : 'group-hover:drop-shadow-[0_0_6px_rgba(255,153,0,0.5)]';
+                <div className="space-y-2">
+                  {leaderboard.map((entry, index) => {
+                    const isLeader = index === 0;
+                    const isPodium = index < 3;
+                    const nameHoverColor = isLeader ? 'group-hover:text-[#E10600]' : 'group-hover:text-aws-orange';
+                    const pointsColorClass = isLeader ? 'text-[#E10600]' : isPodium ? 'text-aws-orange' : 'text-white/80';
 
-                  return (
-                    <div 
-                      key={index} 
-                      className="group flex items-center bg-[#0e0e13]/85 hover:bg-[#161622]/90 border border-white/5 hover:border-aws-orange/20 rounded-sm overflow-hidden h-9.5 transition-all duration-300 hover:translate-x-1"
-                    >
+                    return (
                       <div 
-                        className={`w-8 h-full flex items-center justify-center font-mono text-sm font-black select-none transition-colors duration-300 ${
-                          isLeader ? 'bg-[#E10600] group-hover:bg-[#ff0a00] text-white' : 'bg-zinc-800 group-hover:bg-zinc-700 text-white/70 group-hover:text-white'
+                        key={index} 
+                        className={`group flex items-center border rounded-lg overflow-hidden h-11 transition-all duration-300 hover:translate-x-1 ${
+                          index === 0 ? 'bg-aws-orange/[0.08] border-aws-orange/40 hover:border-aws-orange' :
+                          index === 1 ? 'bg-slate-500/[0.06] border-slate-400/30 hover:border-slate-300' :
+                          index === 2 ? 'bg-amber-700/[0.06] border-amber-600/30 hover:border-amber-500' :
+                          'bg-[#0e0e13]/85 hover:bg-[#161622]/90 border-white/5 hover:border-white/20'
                         }`}
                       >
-                        {index + 1}
-                      </div>
-                      <div 
-                        className={`w-1 h-full transition-transform duration-300 group-hover:scale-y-110 ${
-                          isLeader 
-                            ? 'bg-[#E10600]'
-                            : entry.pass?.toLowerCase().includes('vip') 
-                              ? 'bg-emerald-500' 
-                              : 'bg-aws-orange'
-                        }`} 
-                      />
-                      <div className="flex-1 px-3 flex items-center justify-between min-w-0 h-full bg-chequered bg-chequered-hover transition-all duration-300">
-                        <span className={`font-sans font-black italic uppercase tracking-wider text-white/95 truncate transition-colors duration-300 ${nameSizeClass} ${nameHoverColor}`}>
-                          {entry.name}
-                        </span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <span className={`font-mono font-black group-hover:text-white transition-all duration-300 group-hover:scale-110 ${pointsSizeClass} ${pointsColorClass} ${pointsGlowClass}`}>
-                            {entry.total_points}
-                          </span>
-                          <span className="font-mono text-[9px] font-bold text-white/40 group-hover:text-white/70 transition-colors duration-300">PTS</span>
+                        <div 
+                          className={`w-11 sm:w-12 h-full flex items-center justify-center font-mono text-sm sm:text-base font-black select-none transition-colors duration-300 shrink-0 ${
+                            index === 0 ? 'bg-[#FFD700] text-black font-black' :
+                            index === 1 ? 'bg-slate-300 text-black font-black' :
+                            index === 2 ? 'bg-amber-600 text-white font-black' :
+                            'bg-zinc-800 group-hover:bg-zinc-700 text-white/70 group-hover:text-white'
+                          }`}
+                        >
+                          {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : index + 1}
+                        </div>
+
+                        <div 
+                          className={`w-1.5 h-full transition-transform duration-300 group-hover:scale-y-110 shrink-0 ${
+                            isLeader 
+                              ? 'bg-[#E10600]'
+                              : entry.pass?.toLowerCase().includes('vip') 
+                                ? 'bg-emerald-500' 
+                                : 'bg-aws-orange'
+                          }`} 
+                        />
+
+                        <div className="flex-1 px-3 sm:px-4 flex items-center justify-between min-w-0 h-full bg-chequered bg-chequered-hover transition-all duration-300">
+                          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+                            <span className={`font-sans font-black italic uppercase tracking-wider text-white/95 truncate transition-colors duration-300 text-xs sm:text-sm ${nameHoverColor}`}>
+                              {entry.name}
+                            </span>
+                            {index === 0 && (
+                              <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-[#FFD700]/20 border border-[#FFD700]/40 font-mono text-[9px] font-bold text-[#FFD700] uppercase tracking-wider">
+                                Champion
+                              </span>
+                            )}
+                            {index > 0 && index < 5 && (
+                              <span className="hidden sm:inline-block px-2 py-0.5 rounded bg-white/5 border border-white/10 font-mono text-[9px] font-bold text-white/50 uppercase tracking-wider">
+                                Top 5
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-3 sm:gap-4 shrink-0">
+                            <span className="hidden sm:inline-block font-mono text-xs text-white/40">
+                              {entry.referrals} {entry.referrals === 1 ? 'ref' : 'refs'}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <span className={`font-mono font-black text-sm sm:text-base group-hover:scale-105 transition-all duration-300 ${pointsColorClass}`}>
+                                {entry.total_points}
+                              </span>
+                              <span className="font-mono text-[9px] sm:text-[10px] font-bold text-white/40">PTS</span>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })
+                    );
+                  })}
+                </div>
               )}
-              {!leaderboardLoading && leaderboard.length < 5 && Array.from({ length: 5 - leaderboard.length }).map((_, i) => {
-                const pos = leaderboard.length + i + 1;
-                return (
-                  <div 
-                    key={pos} 
-                    className="flex items-center bg-[#0a0a0c]/30 border border-white/5 border-dashed rounded-sm h-9.5 opacity-35 select-none"
-                  >
-                    <div className="w-8 h-full flex items-center justify-center font-mono text-sm font-bold bg-white/5 text-white/20">
-                      {pos}
-                    </div>
-                    <div className="w-1 h-full bg-white/10" />
-                    <div className="flex-1 pl-3 font-mono text-[9px] text-white/20 uppercase tracking-wider">
-                      Grid Slot Open
-                    </div>
-                  </div>
-                );
-              })}
             </div>
 
-            {/* Rest of Grid P6+ (SCROLLABLE ON MOBILE) */}
-            {!leaderboardLoading && leaderboard.length > 5 && (
-              <div className="border-t border-white/5 p-3.5 pt-2.5 space-y-2 max-h-60 custom-scrollbar bg-[#08080d]/60">
-                <div className="font-mono text-[10px] text-white/40 uppercase tracking-[0.2em] mb-1 font-semibold flex items-center justify-between">
-                  <span>Rest of Grid</span>
-                  <span className="text-white/30 text-[9px]">Scroll ↓</span>
-                </div>
-                {leaderboard.slice(5).map((entry, index) => {
-                  const actualRank = index + 6;
-                  return (
-                    <div 
-                      key={actualRank} 
-                      className="group flex items-center bg-[#0e0e13]/70 hover:bg-[#161622]/90 border border-white/5 hover:border-aws-orange/20 rounded-sm overflow-hidden h-9 transition-all duration-300 hover:translate-x-1"
-                    >
-                      <div className="w-8 h-full flex items-center justify-center font-mono text-xs font-black select-none bg-zinc-800/80 group-hover:bg-zinc-700 text-white/60 group-hover:text-white">
-                        {actualRank}
-                      </div>
-                      <div className={`w-1 h-full ${entry.pass?.toLowerCase().includes('vip') ? 'bg-emerald-500' : 'bg-aws-orange'}`} />
-                      <div className="flex-1 px-3 flex items-center justify-between min-w-0 h-full bg-chequered bg-chequered-hover transition-all duration-300">
-                        <span className="font-sans font-black italic uppercase tracking-wider text-white/80 group-hover:text-aws-orange text-[10.5px] truncate">
-                          {entry.name}
-                        </span>
-                        <div className="flex items-center gap-1 shrink-0">
-                          <span className="font-mono font-black text-aws-orange text-[12.5px]">
-                            {entry.total_points}
-                          </span>
-                          <span className="font-mono text-[9px] font-bold text-white/40">PTS</span>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+            {/* Footer */}
+            <div className="px-5 py-3.5 border-t border-white/5 bg-[#08080c]/50 flex items-center justify-between font-mono text-[10px] text-white/50 uppercase tracking-widest font-semibold">
+              <span>GP: DHULE 2026</span>
+              <span className="text-emerald-400">OFFICIAL ARCHIVE</span>
+            </div>
           </div>
+
         </div>
 
         {/* Footer */}

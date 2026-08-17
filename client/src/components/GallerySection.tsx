@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { galleryFiles as localGalleryFiles } from 'virtual:event-gallery';
 import { SectionHeader } from './LayoutElements';
-import { X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, ExternalLink } from 'lucide-react';
 
 const galleryFiles = localGalleryFiles;
 /* ─── helpers ─────────────────────────────────────────────────── */
@@ -178,9 +178,20 @@ export const GallerySection = () => {
           subtitle=""
           sysId="09.GLY"
         />
-        <p className="font-sans text-xs sm:text-sm md:text-base opacity-60 font-medium leading-relaxed max-w-xl mb-8 -mt-2 relative z-10">
-          Real moments from our community events, workshops, and cloud conferences.
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 -mt-2 relative z-10">
+          <p className="font-sans text-xs sm:text-sm md:text-base opacity-60 font-medium leading-relaxed max-w-xl">
+            Real moments from our community events. View the official SCD 2026 album on Google Photos.
+          </p>
+          <a
+            href="https://photos.app.goo.gl/eowTkRd1urTGirN49"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-aws-orange text-black font-sans font-black italic uppercase text-xs tracking-wider rounded-sm hover:bg-white transition-all shadow-[0_0_15px_rgba(255,153,0,0.2)] shrink-0 w-fit cursor-pointer"
+          >
+            <span>SCD 2026 Photo Album</span>
+            <ExternalLink size={13} />
+          </a>
+        </div>
       </div>
       
       <div className="mt-12 relative z-10 grid gap-2 sm:gap-4" style={{ gridTemplateColumns: `repeat(${columnsCount}, minmax(0, 1fr))` }}>

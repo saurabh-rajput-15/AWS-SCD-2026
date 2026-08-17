@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../lib/api';
 import { motion } from 'motion/react';
-import { ChevronRight, ArrowLeft, Send, Building2, User, Mail, MessageSquare, Tag } from 'lucide-react';
+import { ChevronRight, ArrowLeft, Send, Building2, User, Mail, MessageSquare, Tag, Sparkles, MapPin, Laptop, Trophy, Users } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const sponsorTiers = [
@@ -95,6 +95,86 @@ export const SponsorPage = () => {
             <p className="text-sm sm:text-base text-white/50 font-medium max-w-2xl mx-auto leading-relaxed">
               Partner with one of the region's largest student-led technology events focused on AI, Cloud, AWS, DevOps, Innovation, and Developer Communities.
             </p>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Featured Current Sponsor Section */}
+      <section className="py-10 px-6 sm:px-12 lg:px-24 border-t border-white/5">
+        <div className="max-w-7xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-8"
+          >
+            <div className="font-mono text-[10px] text-aws-orange uppercase tracking-[0.2em] mb-2">
+              Official Sponsor
+            </div>
+            <h2 className="font-sans text-2xl sm:text-4xl font-black italic tracking-tighter uppercase text-white">
+              Proudly Supported By
+            </h2>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="relative bg-gradient-to-br from-[#0c0f14] via-[#090a0d] to-[#050505] border border-blue-500/30 rounded-2xl p-6 sm:p-8 overflow-hidden shadow-[0_0_40px_rgba(59,130,246,0.1)] group"
+          >
+            {/* Tech line & Glow */}
+            <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-blue-500 via-cyan-400 to-aws-orange" />
+            <div className="absolute -right-20 -bottom-20 w-60 h-60 bg-blue-500/10 rounded-full blur-[80px] pointer-events-none" />
+
+            <div className="flex flex-col md:flex-row items-center gap-8 relative z-10">
+              {/* Logo Frame */}
+              <div className="w-48 h-48 sm:w-56 sm:h-56 rounded-2xl bg-black/80 border border-blue-500/20 p-6 flex items-center justify-center shrink-0 relative overflow-hidden group-hover:border-blue-400/50 transition-colors shadow-2xl">
+                <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff03_1px,transparent_1px),linear-gradient(to_bottom,#ffffff03_1px,transparent_1px)] bg-[size:16px_16px] pointer-events-none" />
+                <img
+                  src="/sponcer/ASUS-STORE-BY-GOPAL-COMP-DHULE.PNG"
+                  alt="ASUS Store by Gopal Computers Dhule"
+                  className="max-w-[95%] max-h-[95%] object-contain drop-shadow-[0_0_20px_rgba(59,130,246,0.35)] group-hover:scale-105 transition-transform duration-500 relative z-10"
+                />
+              </div>
+
+              {/* Sponsor Info */}
+              <div className="flex flex-col text-left flex-1">
+                <div className="flex flex-wrap items-center gap-2.5 mb-3">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/10 border border-blue-500/30 text-blue-400 font-mono text-[10px] font-bold uppercase tracking-widest rounded-full">
+                    <Sparkles size={12} className="text-blue-400" /> Official Event Sponsor
+                  </span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white/5 border border-white/10 text-white/60 font-mono text-[10px] uppercase tracking-widest rounded-full">
+                    <MapPin size={12} className="text-aws-orange" /> Dhule, Maharashtra
+                  </span>
+                </div>
+
+                <h3 className="font-sans font-black italic text-2xl sm:text-3xl text-white uppercase tracking-tight mb-1">
+                  ASUS Exclusive Store
+                </h3>
+                <p className="font-mono text-xs text-aws-orange uppercase tracking-wider font-bold mb-3">
+                  By Gopal Computers, Dhule
+                </p>
+                <p className="font-sans text-xs sm:text-sm text-white/60 leading-relaxed max-w-2xl mb-5">
+                  Official Technology & Hardware Sponsor for AWS Student Community Day Dhule 2026. Empowering our builder community, student innovators, and cloud architects with state-of-the-art computing power, gaming systems, and next-gen hardware solutions.
+                </p>
+
+                <div className="flex flex-wrap gap-3 font-mono text-xs">
+                  <div className="px-3 py-2 bg-white/[0.02] border border-white/5 rounded-lg flex items-center gap-2">
+                    <Laptop size={14} className="text-blue-400" />
+                    <span className="text-white/80 text-[11px] uppercase tracking-wider">Official Tech Partner</span>
+                  </div>
+                  <div className="px-3 py-2 bg-white/[0.02] border border-white/5 rounded-lg flex items-center gap-2">
+                    <Trophy size={14} className="text-aws-orange" />
+                    <span className="text-white/80 text-[11px] uppercase tracking-wider">Hardware Showcase</span>
+                  </div>
+                  <div className="px-3 py-2 bg-white/[0.02] border border-white/5 rounded-lg flex items-center gap-2">
+                    <Users size={14} className="text-[#00ff00]" />
+                    <span className="text-white/80 text-[11px] uppercase tracking-wider">Regional Builder Support</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           </motion.div>
         </div>
       </section>

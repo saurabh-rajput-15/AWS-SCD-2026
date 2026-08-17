@@ -73,6 +73,16 @@ export const LogoMarquee = () => {
             />
 
             <img
+              src="/sponcer/ASUS-STORE-BY-GOPAL-COMP-DHULE.PNG"
+              alt="ASUS Store by Gopal Computers Dhule"
+              width={130}
+              height={56}
+              loading="lazy"
+              decoding="async"
+              className="marquee-logo h-14 object-contain grayscale-0 opacity-100 sm:grayscale sm:opacity-80 sm:hover:grayscale-0 sm:hover:opacity-100 sm:focus:grayscale-0 sm:focus:opacity-100 transition-all duration-300"
+            />
+
+            <img
               src="/ARIF-white.png"
               alt="ARIF Logo"
               width={120}

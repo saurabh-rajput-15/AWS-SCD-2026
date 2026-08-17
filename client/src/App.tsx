@@ -28,6 +28,7 @@ import { SpeakersSection } from './components/SpeakersSection';
 import { GallerySection } from './components/GallerySection';
 import { FAQSection } from './components/FAQSection';
 import { DirectionsSection } from './components/DirectionsSection';
+import { ThankYouSection } from './components/ThankYouSection';
 import { FooterSection } from './components/FooterSection';
 const SponsorPage = lazy(() => import('./components/SponsorPage').then(module => ({ default: module.SponsorPage })));
 const NotFoundPage = lazy(() => import('./components/NotFoundPage').then(module => ({ default: module.NotFoundPage })));
@@ -88,6 +89,7 @@ function HomePage() {
             {/* Act 5: Social Proof & Info */}
             <GallerySection />
             <FAQSection />
+            <ThankYouSection />
             <FooterSection />
         </main>
       </div>

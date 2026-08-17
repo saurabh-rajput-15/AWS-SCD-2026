@@ -1,4 +1,4 @@
-import { Mail, Linkedin, Twitter, Instagram } from 'lucide-react';
+import { Mail, Linkedin, Twitter, Instagram, MessageCircle } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const quickLinks = [
@@ -64,6 +64,7 @@ export const FooterSection = () => {
             <div className="flex flex-col">
                <span className="font-sans font-black italic text-base sm:text-lg uppercase text-white mb-3 sm:mb-4">Social</span>
                <ul className="flex flex-col gap-3 font-mono text-[10px] sm:text-xs opacity-60 uppercase tracking-wider sm:tracking-widest">
+                  <li><a href="https://chat.whatsapp.com/KsMTV60oG2kBuaoofwQdxJ" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#25D366] transition-colors"><MessageCircle size={14} className="text-[#25D366]" /> WhatsApp Community</a></li>
                   <li><a href="https://linkedin.com/company/aws-sbg-at-svkm-iot-dhule" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#0a66c2] transition-colors"><Linkedin size={14} /> LinkedIn</a></li>
                   <li><a href="https://x.com/AWSCC_SVKMIOT" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-white transition-colors"><Twitter size={14} /> X / Twitter</a></li>
                   <li><a href="https://www.instagram.com/awsbuildersdhule/" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-[#e1306c] transition-colors"><Instagram size={14} /> Instagram</a></li>
