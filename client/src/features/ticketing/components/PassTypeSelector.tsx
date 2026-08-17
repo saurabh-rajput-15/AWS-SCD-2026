@@ -1,4 +1,4 @@
-import { AlertCircle, Phone, Mail } from 'lucide-react';
+import { CheckCircle2, Phone, Mail } from 'lucide-react';
 import type { PassType } from '../hooks/usePassTypes';
 import { Link } from 'react-router-dom';
 
@@ -19,22 +19,21 @@ export function PassTypeSelector({ loading }: Props) {
 
   return (
     <div className="py-4">
-      {/* Notice — only content shown */}
-      <div className="p-6 bg-gradient-to-br from-f1-red/15 via-[#0d0d0d] to-aws-orange/10 border-2 border-aws-orange/40 rounded-xl text-left shadow-[0_0_30px_rgba(255,153,0,0.1)]">
+      <div className="p-6 bg-gradient-to-br from-aws-orange/10 via-[#0d0d0d] to-black border border-white/10 rounded-xl text-left shadow-xl">
         <div className="flex items-start gap-4">
-          <AlertCircle size={28} className="text-aws-orange shrink-0 mt-1" />
+          <CheckCircle2 size={28} className="text-emerald-400 shrink-0 mt-1" />
           <div className="space-y-2">
             <h3 className="font-sans font-black italic text-xl sm:text-2xl uppercase tracking-tight text-white">
-              Digital Passes Sold Out
+              Event Registration Concluded
             </h3>
             <p className="font-mono text-xs text-white/70 leading-relaxed">
-              Online digital passes are currently sold out for a moment. Please contact event organizers for possible physical passes as passes are limited!
+              Registrations for AWS Student Community Day Dhule 2026 are now officially closed. Check out our exclusive Bags &amp; Welcome Kit Merch Combo or explore event moments.
             </p>
           </div>
         </div>
 
         <div className="mt-5 p-4 bg-black/50 border border-white/10 rounded-lg font-mono text-xs">
-          <p className="text-aws-orange font-bold uppercase tracking-wider text-[11px] mb-3">Pass Inquiry Contacts:</p>
+          <p className="text-aws-orange font-bold uppercase tracking-wider text-[11px] mb-3">Event Organizers Contact:</p>
           <div className="space-y-2 text-white/80">
             <p className="flex items-center justify-between">
               <span>Soham Chaudhari</span>
@@ -55,12 +54,18 @@ export function PassTypeSelector({ loading }: Props) {
           </div>
         </div>
 
-        <div className="mt-5 text-center">
+        <div className="mt-5 flex flex-wrap gap-3 justify-center">
+          <a
+            href="/#store"
+            className="px-6 py-2.5 bg-aws-orange text-black font-sans font-black italic uppercase text-xs tracking-widest skew-x-[-6deg] hover:bg-white transition-all shadow-[0_0_15px_rgba(255,153,0,0.3)]"
+          >
+            <span className="skew-x-[6deg] block">Get Merch Combo</span>
+          </a>
           <Link
             to="/"
-            className="inline-block px-6 py-2.5 bg-white/10 hover:bg-white/20 transition-colors font-mono text-xs uppercase tracking-widest border border-white/20 text-white"
+            className="px-6 py-2.5 bg-white/10 hover:bg-white/20 transition-colors font-mono text-xs uppercase tracking-widest border border-white/20 text-white"
           >
-            ← Back to Event
+            ← Back to Home
           </Link>
         </div>
       </div>

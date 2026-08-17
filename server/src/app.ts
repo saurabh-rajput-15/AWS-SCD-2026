@@ -13,6 +13,7 @@ import emailRouter from './features/email/emailRouter.js';
 import ordersRouter from './features/orders/ordersRouter.js';
 import authRouter from './features/auth/authRouter.js';
 import ticketsRouter from './features/tickets/ticketsRouter.js';
+import feedbackRouter from './features/feedback/feedbackRouter.js';
 import { startEmailProcessor } from './features/email/emailProcessor.js';
 import { errorHandler } from './shared/middleware/errorHandler.js';
 
@@ -66,6 +67,7 @@ app.use('/api/email', emailRouter);
 app.use('/api/orders', ordersRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/tickets', ticketsRouter);
+app.use('/api/feedback', feedbackRouter);
 
 // Health check
 app.get('/api/health', (_req, res) => {

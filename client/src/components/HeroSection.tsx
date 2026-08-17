@@ -217,11 +217,11 @@ export const HeroSection = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-3 px-4 py-2 bg-aws-orange/10 border border-aws-orange/20 max-w-max rounded-full"
+            className="inline-flex items-center gap-3 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 max-w-max rounded-full"
           >
-            <span className="w-2 h-2 rounded-full bg-aws-orange animate-pulse"></span>
-            <span className="font-mono text-[10px] sm:text-xs text-aws-orange uppercase tracking-[0.2em] font-bold">
-              AWS Student Community Day
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span className="font-mono text-[10px] sm:text-xs text-emerald-400 uppercase tracking-[0.2em] font-bold">
+              AWS Student Community Day // Event Concluded
             </span>
           </motion.div>
 
@@ -251,8 +251,7 @@ export const HeroSection = () => {
             transition={{ delay: 0.4, duration: 0.6 }}
             className="max-w-2xl text-sm lg:text-base opacity-70 font-medium leading-relaxed"
           >
-             <i><b>AWS Student Community Day Dhule 2026</b></i> is the largest student-led cloud event in North Maharashtra, bringing together students, developers, AWS Heroes, Community Builders, UG Leaders, and industry experts under one roof. Supported by the global AWS community, the event offers cutting-edge cloud learning, inspiring technical sessions, and valuable networking opportunities to help the next generation of technology leaders learn, connect, and grow. 
-
+             <i><b>AWS Student Community Day Dhule 2026</b></i> brought together students, developers, AWS Heroes, Community Builders, UG Leaders, and industry experts under one roof. Supported by the global AWS community, the event delivered cutting-edge cloud learning, inspiring technical sessions, and high-impact networking for North Maharashtra builders. 
           </motion.p>
 
           <motion.div
@@ -261,14 +260,14 @@ export const HeroSection = () => {
             transition={{ delay: 0.5, duration: 0.6 }}
             className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 mt-2"
           >
-            <Link to="/ticket">
+            <a href="#store">
               <AngledButton primary={true}>
-                <span>Buy Ticket</span>
+                <span>Merch Store</span>
               </AngledButton>
-            </Link>
-            <a href="#schedule">
+            </a>
+            <a href="#gallery">
               <AngledButton primary={false}>
-                <span>View Agenda</span>
+                <span>Event Gallery</span>
               </AngledButton>
             </a>
           </motion.div>

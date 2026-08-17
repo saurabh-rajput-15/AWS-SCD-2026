@@ -406,4 +406,13 @@ textarea:focus-visible,
   transform: rotateY(180deg);
 }
 
-
+/* ═══════════════════════════════════════════════════════════════════
+   FEEDBACK FORM — Fade-in animation for wizard step transitions
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.35s ease-out both;
+}

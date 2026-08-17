@@ -1,19 +1,6 @@
 [
   {
     "id": 1,
-    "name": "Bhaskar Pathak",
-    "image": "1783840884280.png",
-    "designation": "Senior Solutions Architect at AWS",
-    "role": "",
-    "sessionType": "Community Keynote",
-    "sessionTitle": "Community Growth, Career Opportunities & AWS Certifications",
-    "topic": "AWS Community, Career Growth, Certifications",
-    "shortDescription": "Explore how active community participation, continuous learning, and AWS certifications can accelerate your cloud career while creating meaningful impact within the AWS ecosystem.",
-    "category": "Community Keynote",
-    "featured": true
-  },
-  {
-    "id": 2,
     "name": "Pushkar Thakur",
     "image": "1667990794682.jpeg",
     "designation": "SDE II @ Procedure",
@@ -26,7 +13,7 @@
     "featured": true
   },
   {
-    "id": 3,
+    "id": 2,
     "name": "Ameya Vaidya",
     "image": "1780647595003.png",
     "designation": "Trainer & Tech Speaker",
@@ -39,7 +26,7 @@
     "featured": false
   },
   {
-    "id": 4,
+    "id": 3,
     "name": "Nilesh Vaghela",
     "image": "1714482688164.jpeg",
     "designation": "CEO, ElectroMech & CloudKida",
@@ -52,20 +39,20 @@
     "featured": false
   },
   {
-  "id": 5,
-  "name": "Dimple Vaghela",
-  "image": "1746945573251.jpeg",
-  "designation": "Director, ElectroMech Cloudtech Pvt. Ltd.",
-  "role": "AWS Community Hero | AWS User Group Leader",
-  "sessionType": "Technical Session 3 & Women in Tech Panel",
-  "sessionTitle": "DevOps on AWS",
-  "topic": "CI/CD, Infrastructure as Code, Automation",
-  "shortDescription": "Explore modern DevOps practices on AWS, including CI/CD pipelines, Infrastructure as Code, and automation, followed by insights on leadership and community building during the Women in Tech Panel.",
-  "category": "AWS Community Hero",
-  "featured": false
+    "id": 4,
+    "name": "Dimple Vaghela",
+    "image": "1746945573251.jpeg",
+    "designation": "Director, ElectroMech Cloudtech Pvt. Ltd.",
+    "role": "AWS Community Hero | AWS User Group Leader",
+    "sessionType": "Technical Session 3 & Women in Tech Panel",
+    "sessionTitle": "DevOps on AWS",
+    "topic": "CI/CD, Infrastructure as Code, Automation",
+    "shortDescription": "Explore modern DevOps practices on AWS, including CI/CD pipelines, Infrastructure as Code, and automation, followed by insights on leadership and community building during the Women in Tech Panel.",
+    "category": "AWS Community Hero",
+    "featured": false
   },
   {
-    "id": 6,
+    "id": 5,
     "name": "Abhijeet Chinchole",
     "image": "1726836394723.jpeg",
     "designation": "Platform & Product Engineering Leader",
@@ -78,7 +65,7 @@
     "featured": false
   },
   {
-    "id": 7,
+    "id": 6,
     "name": "Abhishek Maurya",
     "image": "1701733317510.jpeg",
     "designation": "Senior Cloud Engineer at Orange Business India",
@@ -91,7 +78,7 @@
     "featured": false
   },
   {
-    "id": 8,
+    "id": 7,
     "name": "Vipul Chaudhary",
     "image": "1764430670931.jpeg",
     "designation": "Site Reliability Engineer @ Intangles",
@@ -104,7 +91,7 @@
     "featured": false
   },
   {
-    "id": 9,
+    "id": 8,
     "name": "Afreen Bano",
     "image": "1724876847469.jpeg",
     "designation": "Cloud Engineer & Strategic Technologist",
@@ -117,7 +104,7 @@
     "featured": false
   },
   {
-    "id": 10,
+    "id": 9,
     "name": "Anjali Mishra",
     "image": "1764430660887.png",
     "designation": "DevOps Engineer at VirtueCloud",
@@ -130,16 +117,16 @@
     "featured": false
   },
   {
-  "id": 11,
-  "name": "Sanika Kotgire",
-  "image": "1744946870635.jpeg",
-  "designation": "Cloud Data Engineer @ ZS",
-  "role": "AWS Community Builder",
-  "sessionType": "Women in Tech Panel",
-  "sessionTitle": "Women in Tech",
-  "topic": "To Be Announced",
-  "shortDescription": "Join an inspiring panel discussion featuring women leaders in technology as they share their career journeys, leadership experiences, and insights on building a successful career in cloud and tech.",
-  "category": "Panelist",
-  "featured": false
-}
+    "id": 10,
+    "name": "Sanika Kotgire",
+    "image": "1744946870635.jpeg",
+    "designation": "Cloud Data Engineer @ ZS",
+    "role": "AWS Community Builder",
+    "sessionType": "Women in Tech Panel",
+    "sessionTitle": "Women in Tech",
+    "topic": "To Be Announced",
+    "shortDescription": "Join an inspiring panel discussion featuring women leaders in technology as they share their career journeys, leadership experiences, and insights on building a successful career in cloud and tech.",
+    "category": "Panelist",
+    "featured": false
+  }
 ]

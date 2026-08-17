@@ -85,4 +85,16 @@ export const adminApi = {
     organization: string;
     received_by?: string;
   }) => api.post('/api/admin/generate-pass', data, { headers: getHeaders() }),
+
+  getFeedback: () =>
+    api.get('/api/admin/feedback', { headers: getHeaders() }),
+
+  exportFeedback: () =>
+    api.get('/api/admin/export-feedback', {
+      headers: getHeaders(),
+      responseType: 'blob',
+    }),
+
+  deleteFeedback: (id: string) =>
+    api.delete(`/api/admin/feedback/${id}`, { headers: getHeaders() }),
 };

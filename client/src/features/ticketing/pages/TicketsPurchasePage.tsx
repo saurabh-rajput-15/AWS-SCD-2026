@@ -1,7 +1,7 @@
 /* eslint-disable react-doctor/no-chain-state-updates, react-doctor/no-cascading-set-state */
 import { Link, useSearchParams } from 'react-router-dom';
 import { useEffect } from 'react';
-import { ChevronRight, ArrowLeft, AlertCircle, Loader2 } from 'lucide-react';
+import { ChevronRight, ArrowLeft, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 import { api } from '../../../lib/api';
 import { usePassTypes } from '../hooks/usePassTypes';
 import { useRegistration } from '../hooks/useRegistration';
@@ -76,14 +76,14 @@ export function TicketsPurchasePage() {
   if (!registrationEnabled) {
     return (
       <div className="min-h-screen bg-[#050505] text-white flex flex-col items-center justify-center p-4">
-        <AlertCircle size={48} className="text-aws-orange mb-4" />
-        <h1 className="font-sans font-black italic text-3xl sm:text-4xl uppercase tracking-tight mb-2 text-center">Digital Passes Sold Out</h1>
+        <CheckCircle size={48} className="text-emerald-400 mb-4" />
+        <h1 className="font-sans font-black italic text-3xl sm:text-4xl uppercase tracking-tight mb-2 text-center">Registrations Concluded</h1>
         <p className="text-white/60 font-mono text-sm mb-6 text-center max-w-lg leading-relaxed">
-          Online digital passes are currently sold out for a moment. Contact organizers for possible physical passes as passes are limited!
+          AWS Student Community Day Dhule 2026 has concluded. You can still order our official Bags &amp; Welcome Kit Merch Combo or contact our organizing team.
         </p>
 
         <div className="w-full max-w-md p-5 bg-white/5 border border-white/10 rounded-xl mb-8">
-          <p className="font-mono text-[11px] text-aws-orange font-bold uppercase tracking-wider mb-3">Pass Inquiry Contacts:</p>
+          <p className="font-mono text-[11px] text-aws-orange font-bold uppercase tracking-wider mb-3">Event Organizers Contacts:</p>
           <div className="space-y-2 font-mono text-xs text-white/80">
             <p className="flex items-center justify-between">
               <span>Soham Chaudhari</span>
@@ -104,9 +104,14 @@ export function TicketsPurchasePage() {
           </div>
         </div>
 
-        <Link to="/" className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors font-mono text-xs uppercase tracking-widest border border-white/20 text-white hover:text-white">
-          Return to Home
-        </Link>
+        <div className="flex flex-wrap gap-4 justify-center">
+          <a href="/#store" className="px-6 py-3 bg-aws-orange text-black font-sans font-black italic uppercase text-xs tracking-widest skew-x-[-6deg] hover:bg-white transition-all shadow-[0_0_15px_rgba(255,153,0,0.3)]">
+            <span className="skew-x-[6deg] block">Get Merch Combo</span>
+          </a>
+          <Link to="/" className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors font-mono text-xs uppercase tracking-widest border border-white/20 text-white hover:text-white">
+            Return to Home
+          </Link>
+        </div>
       </div>
     );
   }

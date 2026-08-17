@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { SectionHeader } from './LayoutElements';
-import { Check, AlertCircle, Phone, Mail } from 'lucide-react';
+import { Check } from 'lucide-react';
 import { usePassTypes } from '../features/ticketing/hooks/usePassTypes';
 import { Skeleton } from 'boneyard-js/react';
 
@@ -21,45 +21,7 @@ export const TicketsSection = () => {
       {/* Background flare */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] sm:w-[800px] h-[400px] sm:h-[800px] bg-f1-red/5 rounded-full blur-[120px] sm:blur-[180px] pointer-events-none"></div>
 
-      <SectionHeader title="Paddock Passes" subtitle="Secure your spot on the grid. Choose the pass that fits your profile and join the cloud revolution." sysId="03.TKT" />
-
-      {/* Online Digital Pass Availability Notice Banner */}
-      <div className="max-w-4xl mx-auto mt-8 mb-4 relative z-20">
-        <div className="p-5 sm:p-6 bg-gradient-to-r from-f1-red/20 via-amber-950/30 to-f1-red/20 border-2 border-aws-orange/40 rounded-xl shadow-[0_0_30px_rgba(255,153,0,0.15)] text-left backdrop-blur-md">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-3">
-              <AlertCircle size={26} className="text-aws-orange shrink-0 mt-0.5" />
-              <div>
-                <h4 className="font-sans font-black italic text-lg sm:text-xl uppercase tracking-tight text-white flex items-center gap-2">
-                  Digital Passes Currently Sold Out
-                  <span className="text-[10px] font-mono font-normal tracking-widest text-aws-orange bg-aws-orange/10 px-2 py-0.5 border border-aws-orange/30 rounded">TEMPORARY</span>
-                </h4>
-                <p className="font-mono text-xs text-white/80 mt-1 leading-relaxed">
-                  Digital passes are currently sold out online for a moment. Please contact event organizers for possible physical passes as availability is strictly limited!
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-4 pt-4 border-t border-white/10 flex flex-wrap gap-4 items-center justify-between font-mono text-xs">
-            <span className="text-aws-orange font-bold uppercase tracking-wider text-[11px]">Pass Inquiry Contacts:</span>
-            <div className="flex flex-wrap gap-4 text-white/90">
-              <a href="tel:+919834382337" className="flex items-center gap-1.5 hover:text-aws-orange transition-colors">
-                <Phone size={13} className="text-aws-orange" /> Soham: <span className="font-bold">+91 98343 82337</span>
-              </a>
-              <a href="tel:+918007298092" className="flex items-center gap-1.5 hover:text-aws-orange transition-colors">
-                <Phone size={13} className="text-aws-orange" /> Vaibhav: <span className="font-bold">+91 80072 98092</span>
-              </a>
-              <a href="tel:+919890991510" className="flex items-center gap-1.5 hover:text-aws-orange transition-colors">
-                <Phone size={13} className="text-aws-orange" /> Saurabh: <span className="font-bold">+91 98909 91510</span>
-              </a>
-              <a href="mailto:info@aws-scd-dhule.tech" className="flex items-center gap-1.5 hover:text-aws-orange transition-colors">
-                <Mail size={13} className="text-aws-orange" /> info@aws-scd-dhule.tech
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
+      <SectionHeader title="Paddock Passes" subtitle="Event registrations for SCD Dhule 2026 are officially concluded. Thank you to all attendees." sysId="03.TKT" />
 
       <Skeleton name="tickets-section" loading={loading}>
         <div className="flex flex-wrap justify-center gap-6 sm:gap-8 mt-12 sm:mt-16 max-w-7xl mx-auto relative z-10 items-stretch">

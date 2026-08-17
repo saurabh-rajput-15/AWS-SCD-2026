@@ -17,9 +17,10 @@ import { AdminSettings } from '../components/AdminSettings';
 import { PromoCodesManager } from '../components/PromoCodesManager';
 import { ReferralLeaderboard } from '../components/ReferralLeaderboard';
 import { OfflinePassGenerator } from '../components/OfflinePassGenerator';
-import { Mic, Handshake, Building2, Settings, Tag, UserCheck, Gift, UserPlus } from 'lucide-react';
+import { FeedbackTable } from '../components/FeedbackTable';
+import { Mic, Handshake, Building2, Settings, Tag, UserCheck, Gift, UserPlus, Star } from 'lucide-react';
 
-type Tab = 'overview' | 'passes' | 'generate-pass' | 'promo' | 'referrals' | 'registrations' | 'speakers' | 'partners' | 'sponsors' | 'volunteers' | 'mpd' | 'shoutout' | 'export' | 'settings';
+type Tab = 'overview' | 'passes' | 'generate-pass' | 'promo' | 'referrals' | 'registrations' | 'feedback' | 'speakers' | 'partners' | 'sponsors' | 'volunteers' | 'mpd' | 'shoutout' | 'export' | 'settings';
 
 const navItems: Array<{ key: Tab; label: string; icon: any }> = [
   { key: 'overview', label: 'Overview', icon: BarChart3 },
@@ -28,6 +29,7 @@ const navItems: Array<{ key: Tab; label: string; icon: any }> = [
   { key: 'promo', label: 'Promo Codes', icon: Tag },
   { key: 'referrals', label: 'Referrals', icon: Gift },
   { key: 'registrations', label: 'Registrations', icon: Users },
+  { key: 'feedback', label: 'Event Feedback', icon: Star },
   { key: 'speakers', label: 'CFP Speakers', icon: Mic },
   { key: 'partners', label: 'Partners', icon: Handshake },
   { key: 'sponsors', label: 'Sponsors', icon: Building2 },
@@ -156,6 +158,7 @@ export function AdminPage() {
         {activeTab === 'promo' && <PromoCodesManager />}
         {activeTab === 'referrals' && <ReferralLeaderboard />}
         {activeTab === 'registrations' && <RegistrationsTable />}
+        {activeTab === 'feedback' && <FeedbackTable />}
         {activeTab === 'speakers' && <SpeakersTable />}
         {activeTab === 'partners' && <PartnersTable />}
         {activeTab === 'sponsors' && <SponsorsTable />}
@@ -239,6 +242,19 @@ export function AdminPage() {
               </div>
               <div>
                 <ExportCSVButton type="partners" />
+              </div>
+            </div>
+
+            {/* Event & Canteen Feedback Export */}
+            <div className="bg-[#111] border border-white/5 p-6 flex flex-col justify-between text-left">
+              <div>
+                <h3 className="font-sans font-black italic uppercase tracking-tight text-white mb-2">Export Event & Canteen Feedback</h3>
+                <p className="font-sans text-xs text-white/40 mb-6">
+                  Download attendee ratings across all sessions, venue, organization, NPS score, food quality reviews, and future suggestions.
+                </p>
+              </div>
+              <div>
+                <ExportCSVButton type="feedback" />
               </div>
             </div>
           </div>

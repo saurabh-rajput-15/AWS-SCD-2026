@@ -78,7 +78,7 @@ export const SpeakersSection = () => {
       <div className="mb-12">
         <SectionHeader 
           title="Speakers" 
-          subtitle="Our lineup of industry experts, cloud architects, and visionaries is currently preparing in the paddock. Stay tuned for speaker reveals." 
+          subtitle="Our stellar lineup of industry experts, AWS Heroes, and cloud architects who delivered keynotes and technical deep dives at SCD Dhule 2026." 
           sysId="02.SPK" 
         />
       </div>

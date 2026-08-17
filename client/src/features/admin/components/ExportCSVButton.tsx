@@ -3,7 +3,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { adminApi } from '../services/adminApi';
 
 interface ExportCSVButtonProps {
-  type: 'registrations' | 'volunteers' | 'speakers' | 'sponsors' | 'partners' | 'mpds';
+  type: 'registrations' | 'volunteers' | 'speakers' | 'sponsors' | 'partners' | 'mpds' | 'feedback';
 }
 
 export function ExportCSVButton({ type }: ExportCSVButtonProps) {
@@ -39,6 +39,10 @@ export function ExportCSVButton({ type }: ExportCSVButtonProps) {
         case 'mpds':
           res = await adminApi.exportMpds();
           filename = 'scd-mpd';
+          break;
+        case 'feedback':
+          res = await adminApi.exportFeedback();
+          filename = 'scd-feedback';
           break;
       }
 

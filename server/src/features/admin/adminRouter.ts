@@ -1295,5 +1295,174 @@ router.post('/generate-pass', async (req, res, next) => {
   }
 });
 
+// GET /api/admin/feedback - Fetch all event & canteen feedback with metrics
+router.get('/feedback', async (_req, res, next) => {
+  try {
+    const { data: feedbacks, error } = await supabase
+      .from('event_feedback')
+      .select('*')
+      .order('submitted_at', { ascending: false });
+
+    if (error) throw error;
+
+    const list = feedbacks || [];
+    const count = list.length;
+
+    if (count === 0) {
+      return res.json({
+        totalResponses: 0,
+        avgOverallRating: 0,
+        avgVenueRating: 0,
+        avgOrgRating: 0,
+        avgNpsScore: 0,
+        avgCanteenRating: 0,
+        canteenSummary: {
+          breakfast: { taste: 0, freshness: 0, service: 0, count: 0, comments: [] },
+          lunch: { taste: 0, freshness: 0, service: 0, count: 0, comments: [] },
+          snacks: { taste: 0, freshness: 0, service: 0, count: 0, comments: [] },
+          suggestions: []
+        },
+        feedbacks: []
+      });
+    }
+
+    const sumOverall = list.reduce((acc, f) => acc + (f.overall_rating || 0), 0);
+    const sumVenue = list.reduce((acc, f) => acc + (f.venue_rating || 0), 0);
+    const sumOrg = list.reduce((acc, f) => acc + (f.organization_rating || 0), 0);
+    const sumNps = list.reduce((acc, f) => acc + (f.nps_score || 0), 0);
+
+    let canteenCount = 0;
+    let sumCanteen = 0;
+    const canteenSuggestions: string[] = [];
+
+    const mealsData = {
+      breakfast: { tasteSum: 0, freshnessSum: 0, serviceSum: 0, count: 0, comments: [] as string[] },
+      lunch: { tasteSum: 0, freshnessSum: 0, serviceSum: 0, count: 0, comments: [] as string[] },
+      snacks: { tasteSum: 0, freshnessSum: 0, serviceSum: 0, count: 0, comments: [] as string[] },
+    };
+
+    list.forEach(f => {
+      const food = f.food_feedback;
+      if (food) {
+        if (food.overallCanteenRating) {
+          sumCanteen += food.overallCanteenRating;
+          canteenCount++;
+        }
+        if (food.canteenSuggestion?.trim()) {
+          canteenSuggestions.push(food.canteenSuggestion.trim());
+        }
+
+        (['breakfast', 'lunch', 'snacks'] as const).forEach(mealKey => {
+          const item = food[mealKey];
+          if (item && item.attended) {
+            mealsData[mealKey].count++;
+            mealsData[mealKey].tasteSum += item.tasteRating || 0;
+            mealsData[mealKey].freshnessSum += item.freshnessRating || 0;
+            mealsData[mealKey].serviceSum += item.serviceRating || 0;
+            if (item.comment?.trim()) {
+              mealsData[mealKey].comments.push(item.comment.trim());
+            }
+          }
+        });
+      }
+    });
+
+    const canteenSummary = {
+      breakfast: {
+        taste: mealsData.breakfast.count ? +(mealsData.breakfast.tasteSum / mealsData.breakfast.count).toFixed(1) : 0,
+        freshness: mealsData.breakfast.count ? +(mealsData.breakfast.freshnessSum / mealsData.breakfast.count).toFixed(1) : 0,
+        service: mealsData.breakfast.count ? +(mealsData.breakfast.serviceSum / mealsData.breakfast.count).toFixed(1) : 0,
+        count: mealsData.breakfast.count,
+        comments: mealsData.breakfast.comments
+      },
+      lunch: {
+        taste: mealsData.lunch.count ? +(mealsData.lunch.tasteSum / mealsData.lunch.count).toFixed(1) : 0,
+        freshness: mealsData.lunch.count ? +(mealsData.lunch.freshnessSum / mealsData.lunch.count).toFixed(1) : 0,
+        service: mealsData.lunch.count ? +(mealsData.lunch.serviceSum / mealsData.lunch.count).toFixed(1) : 0,
+        count: mealsData.lunch.count,
+        comments: mealsData.lunch.comments
+      },
+      snacks: {
+        taste: mealsData.snacks.count ? +(mealsData.snacks.tasteSum / mealsData.snacks.count).toFixed(1) : 0,
+        freshness: mealsData.snacks.count ? +(mealsData.snacks.freshnessSum / mealsData.snacks.count).toFixed(1) : 0,
+        service: mealsData.snacks.count ? +(mealsData.snacks.serviceSum / mealsData.snacks.count).toFixed(1) : 0,
+        count: mealsData.snacks.count,
+        comments: mealsData.snacks.comments
+      },
+      suggestions: canteenSuggestions
+    };
+
+    res.json({
+      totalResponses: count,
+      avgOverallRating: +(sumOverall / count).toFixed(1),
+      avgVenueRating: +(sumVenue / count).toFixed(1),
+      avgOrgRating: +(sumOrg / count).toFixed(1),
+      avgNpsScore: +(sumNps / count).toFixed(1),
+      avgCanteenRating: canteenCount ? +(sumCanteen / canteenCount).toFixed(1) : 0,
+      canteenSummary,
+      feedbacks: list
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/export-feedback - Export feedback as CSV
+router.get('/export-feedback', async (_req, res, next) => {
+  try {
+    const { data: feedbacks, error } = await supabase
+      .from('event_feedback')
+      .select('*')
+      .order('submitted_at', { ascending: false });
+
+    if (error) throw error;
+
+    const headers = 'id,attendee_name,email,overall_rating,venue_rating,organization_rating,nps_score,canteen_rating,canteen_suggestion,favorite_highlight,suggestions_next_year,submitted_at';
+    const rows = (feedbacks || []).map((f) =>
+      [
+        f.id,
+        f.attendee_name || 'Anonymous',
+        f.email || '',
+        f.overall_rating || '',
+        f.venue_rating || '',
+        f.organization_rating || '',
+        f.nps_score || '',
+        f.food_feedback?.overallCanteenRating || '',
+        f.food_feedback?.canteenSuggestion || '',
+        f.favorite_highlight || '',
+        f.suggestions_next_year || '',
+        f.submitted_at || f.created_at || ''
+      ]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+        .join(',')
+    );
+
+    const csv = [headers, ...rows].join('\n');
+    const date = new Date().toISOString().split('T')[0];
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=scd-feedback-${date}.csv`);
+    res.send(csv);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/admin/feedback/:id - Delete feedback response
+router.delete('/feedback/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase
+      .from('event_feedback')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    res.json({ success: true, message: 'Feedback response deleted' });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;
+
 

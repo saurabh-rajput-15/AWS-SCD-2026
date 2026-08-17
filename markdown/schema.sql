@@ -397,3 +397,26 @@ ALTER TABLE public.community_partners ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.sponsor_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.volunteer_applications ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.app_settings ENABLE ROW LEVEL SECURITY;
+
+CREATE TABLE public.event_feedback (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  attendee_name text DEFAULT 'Anonymous Attendee',
+  email text,
+  overall_rating integer NOT NULL DEFAULT 5 CHECK (overall_rating >= 1 AND overall_rating <= 5),
+  venue_rating integer NOT NULL DEFAULT 5 CHECK (venue_rating >= 1 AND venue_rating <= 5),
+  organization_rating integer NOT NULL DEFAULT 5 CHECK (organization_rating >= 1 AND organization_rating <= 5),
+  general_impressions jsonb DEFAULT '[]'::jsonb,
+  morning_sessions jsonb DEFAULT '[]'::jsonb,
+  afternoon_sessions jsonb DEFAULT '[]'::jsonb,
+  food_feedback jsonb DEFAULT '{}'::jsonb,
+  nps_score integer DEFAULT 10 CHECK (nps_score >= 0 AND nps_score <= 10),
+  favorite_highlight text,
+  suggestions_next_year text,
+  raw_payload jsonb DEFAULT '{}'::jsonb,
+  submitted_at timestamptz DEFAULT now(),
+  created_at timestamptz DEFAULT now()
+);
+
+ALTER TABLE public.event_feedback ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Allow public insert to event_feedback" ON public.event_feedback FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Allow service role read event_feedback" ON public.event_feedback FOR ALL TO service_role USING (true) WITH CHECK (true);

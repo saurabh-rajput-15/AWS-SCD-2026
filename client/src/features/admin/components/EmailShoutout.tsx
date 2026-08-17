@@ -282,6 +282,16 @@ export function EmailShoutout() {
   const [manualText, setManualText] = useState('');
   const [recipientSearch, setRecipientSearch] = useState('');
 
+  const [provider, setProvider] = useState<'mailtrap' | 'resend'>(() => {
+    const saved = localStorage.getItem('scd_email_provider');
+    return saved === 'resend' || saved === 'mailtrap' ? saved : 'mailtrap';
+  });
+
+  const handleProviderChange = (newProvider: 'mailtrap' | 'resend') => {
+    setProvider(newProvider);
+    localStorage.setItem('scd_email_provider', newProvider);
+  };
+
   const [mimeMessage, setMimeMessage] = useState(DEFAULT_THEME_MIME);
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -375,7 +385,7 @@ export function EmailShoutout() {
       const payload: any = {
         mimeMessage,
         recipientSource: recipientSource === 'manual' ? 'csv' : recipientSource,
-        provider: 'mailtrap',
+        provider,
       };
 
       if (recipientSource === 'csv' || recipientSource === 'manual') {
@@ -390,7 +400,7 @@ export function EmailShoutout() {
 
       setSendResult({
         type: 'success',
-        text: data.message || `Broadcast completed via Mailtrap: ${data.sent} sent, ${data.failed} failed.`,
+        text: data.message || `Broadcast completed via ${provider === 'resend' ? 'Resend' : 'Mailtrap'}: ${data.sent} sent, ${data.failed} failed.`,
         sent: data.sent,
         failed: data.failed,
         total: data.total,
@@ -433,29 +443,60 @@ export function EmailShoutout() {
 
   return (
     <div className="space-y-6">
-      {/* Header card with Mailtrap status */}
+      {/* Header card with Provider Selector Toggle */}
       <div className="bg-[#111] border border-white/5 p-6 relative">
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3">
+          <div className="space-y-3">
+            <div className="flex flex-wrap items-center gap-3">
               <h3 className="font-sans font-black italic text-lg text-white flex items-center gap-2">
                 <Send size={18} className="text-aws-orange" />
                 Broadcast Email Dispatch
               </h3>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                Mailtrap Provider
-              </span>
+
+              {/* Provider Selector Segmented Toggle */}
+              <div className="inline-flex items-center p-0.5 rounded-lg bg-black/60 border border-white/10">
+                <button
+                  type="button"
+                  onClick={() => handleProviderChange('mailtrap')}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider transition-all ${
+                    provider === 'mailtrap'
+                      ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 shadow-[0_0_12px_rgba(16,185,129,0.25)]'
+                      : 'text-white/40 hover:text-white/80 border border-transparent'
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${provider === 'mailtrap' ? 'bg-emerald-400 animate-pulse' : 'bg-white/20'}`} />
+                  Mailtrap
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleProviderChange('resend')}
+                  className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-[11px] font-mono font-bold uppercase tracking-wider transition-all ${
+                    provider === 'resend'
+                      ? 'bg-aws-orange/20 text-aws-orange border border-aws-orange/30 shadow-[0_0_12px_rgba(255,153,0,0.25)]'
+                      : 'text-white/40 hover:text-white/80 border border-transparent'
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full ${provider === 'resend' ? 'bg-aws-orange animate-pulse' : 'bg-white/20'}`} />
+                  Resend
+                </button>
+              </div>
             </div>
-            <p className="font-mono text-xs text-white/50 mt-1">
-              Send mass announcements and customized updates to attendees using <strong>Mailtrap Email Delivery</strong>.
+
+            <p className="font-mono text-xs text-white/50">
+              Send mass announcements and customized updates to attendees using{' '}
+              <strong className={provider === 'resend' ? 'text-aws-orange' : 'text-emerald-400'}>
+                {provider === 'resend' ? 'Resend API' : 'Mailtrap API'}
+              </strong>{' '}
+              <span className="text-white/30 text-[10px]">
+                ({provider === 'resend' ? 'api.resend.com · RESEND_API_KEY' : 'send.api.mailtrap.io · MAILTRAP_API_KEY'})
+              </span>
             </p>
           </div>
 
           <button
             type="button"
             onClick={downloadSampleCsv}
-            className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white font-mono text-xs uppercase tracking-wider transition-colors self-start lg:self-auto"
+            className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white/80 hover:text-white font-mono text-xs uppercase tracking-wider transition-colors self-start lg:self-auto shrink-0"
           >
             <Download size={14} className="text-aws-orange" />
             Download Sample CSV
@@ -883,13 +924,21 @@ export function EmailShoutout() {
 
         {/* Action Button */}
         <div className="flex justify-between items-center pt-6 border-t border-white/5 mt-6">
-          <div className="font-mono text-xs text-white/40">
-            Target: <span className="text-white font-bold uppercase">
-              {recipientSource === 'csv' && `CSV (${csvRecipients.length} recipients)`}
-              {recipientSource === 'database_paid' && 'Database (Paid attendees)'}
-              {recipientSource === 'database_all' && 'Database (All registrations)'}
-              {recipientSource === 'database_all_contacts' && 'Database (All event contacts)'}
-              {recipientSource === 'manual' && `Manual (${csvRecipients.length} recipients)`}
+          <div className="font-mono text-xs text-white/40 flex items-center gap-2">
+            <span>
+              Target: <strong className="text-white font-bold uppercase">
+                {recipientSource === 'csv' && `CSV (${csvRecipients.length} recipients)`}
+                {recipientSource === 'database_paid' && 'Database (Paid attendees)'}
+                {recipientSource === 'database_all' && 'Database (All registrations)'}
+                {recipientSource === 'database_all_contacts' && 'Database (All event contacts)'}
+                {recipientSource === 'manual' && `Manual (${csvRecipients.length} recipients)`}
+              </strong>
+            </span>
+            <span className="text-white/20">|</span>
+            <span>
+              Provider: <strong className={`uppercase ${provider === 'resend' ? 'text-aws-orange' : 'text-emerald-400'}`}>
+                {provider}
+              </strong>
             </span>
           </div>
 
@@ -940,8 +989,9 @@ export function EmailShoutout() {
 
                 <div>
                   <span className="text-[10px] text-white/40 uppercase tracking-widest block">Email Provider</span>
-                  <strong className="text-emerald-400 text-sm flex items-center gap-1">
-                    Mailtrap API (send.api.mailtrap.io)
+                  <strong className={`text-sm flex items-center gap-1.5 ${provider === 'resend' ? 'text-aws-orange' : 'text-emerald-400'}`}>
+                    <span className={`w-2 h-2 rounded-full ${provider === 'resend' ? 'bg-aws-orange' : 'bg-emerald-400'} animate-pulse`} />
+                    {provider === 'resend' ? 'Resend API (api.resend.com)' : 'Mailtrap API (send.api.mailtrap.io)'}
                   </strong>
                 </div>
 
@@ -988,7 +1038,7 @@ export function EmailShoutout() {
                 {isSending ? (
                   <>
                     <span className="w-3.5 h-3.5 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                    Dispatching via Mailtrap...
+                    Dispatching via {provider === 'resend' ? 'Resend' : 'Mailtrap'}...
                   </>
                 ) : (
                   <>

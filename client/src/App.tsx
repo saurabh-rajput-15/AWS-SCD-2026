@@ -11,6 +11,7 @@ const AdminPage = lazy(() => import('./features/admin/pages/AdminPage').then(mod
 const SpeakerPage = lazy(() => import('./features/speaker/pages/SpeakerPage').then(module => ({ default: module.SpeakerPage })));
 const VolunteerPage = lazy(() => import('./features/volunteer/pages/VolunteerPage').then(module => ({ default: module.VolunteerPage })));
 const MpdPage = lazy(() => import('./features/mpd/pages/MpdPage').then(module => ({ default: module.MpdPage })));
+const FeedbackPage = lazy(() => import('./features/feedback/pages/FeedbackPage').then(module => ({ default: module.FeedbackPage })));
 import { Preloader } from './components/Preloader';
 import { HeaderSection } from './components/HeaderSection';
 import { HeroSection } from './components/HeroSection';
@@ -21,6 +22,7 @@ import { TimelineSection } from './components/TimelineSection';
 
 import { BecomeSponsorSection } from './components/BecomeSponsorSection';
 import { CommunityPartnersSection } from './components/CommunityPartnersSection';
+import { MerchandiseStoreSection } from './components/MerchandiseStoreSection';
 import { TicketsSection } from './components/TicketsSection';
 import { SpeakersSection } from './components/SpeakersSection';
 import { GallerySection } from './components/GallerySection';
@@ -70,9 +72,9 @@ function HomePage() {
             <LogoMarquee />
             <WhatYouGetSection />
 
-            {/* Act 2: The Program */}
+            {/* Act 2: The Program & Official Store */}
             <SpeakersSection />
-            <TicketsSection />
+            <MerchandiseStoreSection />
             <TimelineSection />
 
             {/* Act 3: The Team & Tickets */}
@@ -126,6 +128,7 @@ export default function App() {
         <Route path="/admin" element={<AdminPage />} />
         <Route path="/status" element={<StatusPage />} />
         <Route path="/badge" element={<BadgePage />} />
+        <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/codeofconduct" element={<CodeOfConductPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
