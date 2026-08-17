@@ -172,9 +172,9 @@ Content-Type: text/html; charset=UTF-8
           <tr>
             <td align="center" style="background:#0f1923;padding: 28px 30px 28px;">
               <img
-                src="https://aws-scd-dhule.tech/scd-dhule-logo.avif"
+                src="https://aws-scd-dhule.tech/scd-dhule-logo.png"
                 alt="AWS Student Community Day Dhule"
-                style="display:block;margin:0 auto 16px;max-width:180px;"
+                style="display:block;margin:0 auto 32px;max-width:200px;"
               />
               <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.3px;">
                 AWS Student Community Day
@@ -252,6 +252,11 @@ Content-Type: text/html; charset=UTF-8
           <!-- FOOTER -->
           <tr>
             <td style="background:#0f1923;padding:24px 30px;text-align:center;">
+              <img
+                src="https://aws-scd-dhule.tech/AWS_Builder.png"
+                alt="AWS Student Builder Group"
+                style="display:block;margin:0 auto 12px;max-height:36px;width:auto;"
+              />
               <p style="margin:0;color:#d1d5db;font-size:13px;font-weight:600;">
                 AWS Student Community Day Dhule 2026
               </p>
@@ -272,10 +277,187 @@ Content-Type: text/html; charset=UTF-8
 
 --AWS-SCD-2026-BOUNDARY--`;
 
-type RecipientSource = 'csv' | 'database_paid' | 'database_all' | 'database_all_contacts' | 'manual';
+export const POST_EVENT_FEEDBACK_CERTIFICATE_MIME = `From: AWS Student Community Day Dhule 2026 <no-reply@aws-scd-dhule.tech>
+Reply-To: info@aws-scd-dhule.tech
+To: {{attendee_email}}
+Subject: 🎓 Thank You for Attending AWS SCD Dhule 2026 — Claim Your Certificate & Share Feedback!
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="AWS-SCD-2026-BOUNDARY"
+
+--AWS-SCD-2026-BOUNDARY
+Content-Type: text/plain; charset=UTF-8
+
+Thank you for attending AWS Student Community Day Dhule 2026!
+Claim your official Certificate of Participation at: https://aws-scd-dhule.tech/certificate?email={{attendee_email}}
+Submit your 2-minute event feedback at: https://aws-scd-dhule.tech/feedback
+Join our WhatsApp Community: https://chat.whatsapp.com/KsMTV60oG2kBuaoofwQdxJ
+
+--AWS-SCD-2026-BOUNDARY
+Content-Type: text/html; charset=UTF-8
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AWS Student Community Day Dhule 2026</title>
+</head>
+<body style="margin:0;padding:0;background:#f0f2f5;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+
+  <table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f0f2f5;padding:32px 16px;">
+    <tr>
+      <td align="center">
+
+        <!-- Main Card Container -->
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+               style="background:#ffffff;border-radius:14px;overflow:hidden;border:1px solid #e5e7eb;box-shadow:0 4px 24px rgba(0,0,0,0.08);">
+
+          <!-- HEADER (Dark as it was) -->
+          <tr>
+            <td align="center" style="background:#0f1923;padding:28px 30px 28px;">
+              <img
+                src="https://aws-scd-dhule.tech/scd-dhule-logo.png"
+                alt="AWS Student Community Day Dhule 2026"
+                style="display:block;margin:0 auto 16px;max-width:180px;height:auto;"
+              />
+              <h1 style="margin:0;color:#ffffff;font-size:24px;font-weight:700;letter-spacing:-0.3px;">
+                AWS Student Community Day
+              </h1>
+              <p style="margin:6px 0 0;color:#FF9900;font-size:15px;font-weight:600;letter-spacing:1px;text-transform:uppercase;">
+                Dhule &nbsp;·&nbsp; 2026
+              </p>
+            </td>
+          </tr>
+
+          <!-- THANK YOU HERO BANNER -->
+          <tr>
+            <td style="background:#fff7ed;border-top:3px solid #FF9900;border-bottom:1px solid #fed7aa;padding:18px 30px;text-align:center;">
+              <span style="font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#c2410c;display:block;margin-bottom:4px;">
+                ★ THANK YOU ATTENDEES ★
+              </span>
+              <h2 style="margin:0;color:#111827;font-size:20px;font-weight:800;letter-spacing:-0.3px;">
+                Thank You for Powering AWS SCD Dhule 2026! 🚀
+              </h2>
+            </td>
+          </tr>
+
+          <!-- BODY CONTENT -->
+          <tr>
+            <td style="padding:36px 36px 28px;">
+
+              <p style="margin:0 0 14px;font-size:16px;line-height:1.6;color:#111827;">
+                Hello <strong>{{attendee_name}}</strong>,
+              </p>
+
+              <p style="margin:0 0 24px;font-size:15px;line-height:1.8;color:#4b5563;">
+                Thank you for attending and bringing your incredible builder energy to <strong>AWS Student Community Day Dhule 2026</strong> on <strong>14 August 2026</strong> at SVKM's Institute of Technology, Dhule! Together, we explored cutting-edge Generative AI, cloud architectures, DevOps, and connected with inspiring tech leaders.
+              </p>
+
+              <!-- ACTION 1: CERTIFICATE CARD -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#fffbeb;border:1px solid #fde68a;border-radius:10px;margin-bottom:20px;">
+                <tr>
+                  <td style="padding:22px 24px;">
+                    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#b45309;margin-bottom:6px;">
+                      🎓 OFFICIAL CREDENTIAL
+                    </div>
+                    <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#111827;">
+                      Claim Your Certificate of Participation
+                    </h3>
+                    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#4b5563;">
+                      Your verified certificate is ready to generate and download in high-resolution! Customize your role, download your digital copy, and showcase it on LinkedIn.
+                    </p>
+                    <a href="https://aws-scd-dhule.tech/certificate?email={{attendee_email}}"
+                       style="background:#FF9900;color:#111827;text-decoration:none;padding:12px 28px;border-radius:8px;font-weight:700;font-size:14px;display:inline-block;letter-spacing:0.2px;">
+                      Generate Certificate &nbsp;→
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- ACTION 2: FEEDBACK CARD -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:10px;margin-bottom:20px;">
+                <tr>
+                  <td style="padding:22px 24px;">
+                    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#0369a1;margin-bottom:6px;">
+                      💬 2-MINUTE SURVEY
+                    </div>
+                    <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#111827;">
+                      Share Your Event Feedback
+                    </h3>
+                    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#4b5563;">
+                      Tell us what you loved, what inspired you, and how we can make the next edition even bigger. Your review helps us continuously elevate the community experience!
+                    </p>
+                    <a href="https://aws-scd-dhule.tech/feedback"
+                       style="background:#0284c7;color:#ffffff;text-decoration:none;padding:11px 26px;border-radius:8px;font-weight:700;font-size:13.5px;display:inline-block;">
+                      Submit Feedback &nbsp;★
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- ACTION 3: WHATSAPP COMMUNITY -->
+              <table width="100%" cellpadding="0" cellspacing="0" border="0"
+                     style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;margin-bottom:24px;">
+                <tr>
+                  <td style="padding:22px 24px;">
+                    <div style="font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:#15803d;margin-bottom:6px;">
+                      🤝 STAY CONNECTED
+                    </div>
+                    <h3 style="margin:0 0 8px;font-size:17px;font-weight:700;color:#111827;">
+                      Join Our WhatsApp Builder Community
+                    </h3>
+                    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#4b5563;">
+                      The event is just the beginning! Connect with fellow student builders, join project study groups, and get notified about future AWS community hackathons.
+                    </p>
+                    <a href="https://chat.whatsapp.com/KsMTV60oG2kBuaoofwQdxJ"
+                       style="background:#16a34a;color:#ffffff;text-decoration:none;padding:11px 26px;border-radius:8px;font-weight:700;font-size:13.5px;display:inline-block;letter-spacing:0.2px;">
+                      Join WhatsApp Group &nbsp;→
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="margin:0;font-size:13px;color:#6b7280;line-height:1.6;">
+                Questions or support? Email us at <a href="mailto:info@aws-scd-dhule.tech" style="color:#FF9900;font-weight:600;text-decoration:none;">info@aws-scd-dhule.tech</a>.
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- FOOTER (Dark as it was) -->
+          <tr>
+            <td style="background:#0f1923;padding:24px 30px;text-align:center;">
+              <img
+                src="https://aws-scd-dhule.tech/AWS_Builder.png"
+                alt="AWS Student Builder Group"
+                style="display:block;margin:0 auto 12px;max-height:36px;width:auto;"
+              />
+              <p style="margin:0;color:#d1d5db;font-size:13px;font-weight:600;">
+                AWS Student Community Day Dhule 2026
+              </p>
+              <p style="margin:6px 0 0;color:#9ca3af;font-size:12px;">
+                Building the next generation of cloud innovators.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+
+      </td>
+    </tr>
+  </table>
+
+</body>
+</html>
+
+--AWS-SCD-2026-BOUNDARY--`;
+
+type RecipientSource = 'csv' | 'database_checked_in' | 'database_paid' | 'database_all' | 'database_all_contacts' | 'manual';
 
 export function EmailShoutout() {
-  const [recipientSource, setRecipientSource] = useState<RecipientSource>('csv');
+  const [recipientSource, setRecipientSource] = useState<RecipientSource>('database_checked_in');
   const [csvFile, setCsvFile] = useState<File | null>(null);
   const [csvRecipients, setCsvRecipients] = useState<RecipientItem[]>([]);
   const [csvStats, setCsvStats] = useState<{ valid: number; duplicates: number; invalid: number } | null>(null);
@@ -292,7 +474,7 @@ export function EmailShoutout() {
     localStorage.setItem('scd_email_provider', newProvider);
   };
 
-  const [mimeMessage, setMimeMessage] = useState(DEFAULT_THEME_MIME);
+  const [mimeMessage, setMimeMessage] = useState(POST_EVENT_FEEDBACK_CERTIFICATE_MIME);
   const [previewDevice, setPreviewDevice] = useState<'desktop' | 'mobile'>('desktop');
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
@@ -753,7 +935,23 @@ export function EmailShoutout() {
         {/* Database Target Mode */}
         {recipientSource.startsWith('database') && (
           <div className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+              <label className={`flex items-start gap-3 p-3.5 border cursor-pointer transition-colors ${
+                recipientSource === 'database_checked_in' ? 'bg-aws-orange/10 border-aws-orange' : 'bg-black/40 border-white/10'
+              }`}>
+                <input
+                  type="radio"
+                  name="db_target"
+                  checked={recipientSource === 'database_checked_in'}
+                  onChange={() => setRecipientSource('database_checked_in')}
+                  className="mt-1 accent-aws-orange"
+                />
+                <div>
+                  <span className="block font-sans font-bold text-xs text-white">Checked-In Attendees</span>
+                  <span className="font-mono text-[10px] text-white/40">Verified at the venue</span>
+                </div>
+              </label>
+
               <label className={`flex items-start gap-3 p-3.5 border cursor-pointer transition-colors ${
                 recipientSource === 'database_paid' ? 'bg-aws-orange/10 border-aws-orange' : 'bg-black/40 border-white/10'
               }`}>
@@ -766,7 +964,7 @@ export function EmailShoutout() {
                 />
                 <div>
                   <span className="block font-sans font-bold text-xs text-white">Paid Registrations</span>
-                  <span className="font-mono text-[10px] text-white/40">Only attendees with confirmed paid passes</span>
+                  <span className="font-mono text-[10px] text-white/40">Confirmed paid passes</span>
                 </div>
               </label>
 
@@ -782,7 +980,7 @@ export function EmailShoutout() {
                 />
                 <div>
                   <span className="block font-sans font-bold text-xs text-white">All Registrations</span>
-                  <span className="font-mono text-[10px] text-white/40">All registered attendee emails</span>
+                  <span className="font-mono text-[10px] text-white/40">All registered emails</span>
                 </div>
               </label>
 
@@ -798,7 +996,7 @@ export function EmailShoutout() {
                 />
                 <div>
                   <span className="block font-sans font-bold text-xs text-white">All Event Contacts</span>
-                  <span className="font-mono text-[10px] text-white/40">Includes speakers, volunteers, partners</span>
+                  <span className="font-mono text-[10px] text-white/40">Speakers, volunteers, partners</span>
                 </div>
               </label>
             </div>
@@ -840,10 +1038,33 @@ export function EmailShoutout() {
 
       {/* STEP 2: Email Content & Live Preview */}
       <div className="bg-[#111] border border-white/5 p-6">
-        <h4 className="font-mono text-xs uppercase tracking-widest text-aws-orange mb-4 flex items-center gap-2 font-bold">
-          <span className="w-5 h-5 rounded-full bg-aws-orange/20 text-aws-orange flex items-center justify-center text-[10px]">2</span>
-          Email Payload &amp; Template Variables
-        </h4>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <h4 className="font-mono text-xs uppercase tracking-widest text-aws-orange flex items-center gap-2 font-bold">
+            <span className="w-5 h-5 rounded-full bg-aws-orange/20 text-aws-orange flex items-center justify-center text-[10px]">2</span>
+            Email Payload &amp; Template
+          </h4>
+
+          {/* Preset Switcher */}
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="font-mono text-[10px] text-white/40 uppercase tracking-wider">
+              Load Preset:
+            </span>
+            <button
+              type="button"
+              onClick={() => setMimeMessage(POST_EVENT_FEEDBACK_CERTIFICATE_MIME)}
+              className="px-2.5 py-1 bg-aws-orange/15 hover:bg-aws-orange text-aws-orange hover:text-black font-mono text-[11px] rounded border border-aws-orange/30 font-semibold transition-all cursor-pointer"
+            >
+              🎓 Post-Event: Feedback &amp; Certificate
+            </button>
+            <button
+              type="button"
+              onClick={() => setMimeMessage(DEFAULT_THEME_MIME)}
+              className="px-2.5 py-1 bg-white/5 hover:bg-white/15 text-white/70 hover:text-white font-mono text-[11px] rounded border border-white/10 transition-all cursor-pointer"
+            >
+              🎟️ Ticket Confirmation
+            </button>
+          </div>
+        </div>
 
         {/* Variables Helper Pills */}
         <div className="mb-4 bg-black/40 border border-white/10 p-3 rounded-sm">

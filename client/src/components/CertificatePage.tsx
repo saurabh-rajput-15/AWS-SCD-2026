@@ -36,6 +36,8 @@ export const CertificatePage = () => {
   const [isVerified, setIsVerified] = useState(false);
 
   const certRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
   const [isGeneratingPng, setIsGeneratingPng] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
@@ -179,9 +181,28 @@ export const CertificatePage = () => {
   useEffect(() => {
     const initialQuery = searchParams.get("email") || searchParams.get("id");
     if (initialQuery) {
+      setSearchQuery(initialQuery);
       handleLookup(initialQuery);
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    const updateScale = () => {
+      if (containerRef.current) {
+        const availableWidth = containerRef.current.clientWidth;
+        const targetWidth = 920;
+        if (availableWidth < targetWidth && availableWidth > 0) {
+          setScale(availableWidth / targetWidth);
+        } else {
+          setScale(1);
+        }
+      }
+    };
+
+    updateScale();
+    window.addEventListener("resize", updateScale);
+    return () => window.removeEventListener("resize", updateScale);
+  }, [isVerified]);
 
   const handleDownloadPng = async () => {
     if (!certRef.current || !isVerified) return;
@@ -309,7 +330,7 @@ export const CertificatePage = () => {
               ) : (
                 <Sparkles size={14} />
               )}
-              <span>{searching ? "Verifying..." : "Verify & Unlock"}</span>
+              <span>{searching ? "Verifying..." : "Verify"}</span>
             </button>
           </form>
 
@@ -333,11 +354,31 @@ export const CertificatePage = () => {
         {/* Certificate Display Area */}
         {isVerified ? (
           <div className="w-full max-w-5xl mx-auto flex flex-col items-center mb-10">
-            {/* Certificate Canvas / Card (High-Res Export Target) */}
-            <div className="w-full overflow-x-auto pb-4 flex justify-center">
+            {/* Certificate Canvas / Card (High-Res Export Target & Responsive Mobile Fit) */}
+            <div
+              ref={containerRef}
+              className="w-full flex justify-center items-center overflow-hidden pb-4"
+            >
               <div
-                ref={certRef}
-                className="w-[920px] min-w-[920px] h-[640px] bg-[#090a0f] relative overflow-hidden rounded-2xl border-4 border-aws-orange/80 shadow-[0_0_60px_rgba(0,0,0,0.9)] p-8 flex flex-col justify-between select-none"
+                style={{
+                  width: `${920 * scale}px`,
+                  height: `${640 * scale}px`,
+                  position: "relative",
+                  flexShrink: 0,
+                  transition: "width 0.15s ease, height 0.15s ease",
+                }}
+              >
+                <div
+                  style={{
+                    transform: `scale(${scale})`,
+                    transformOrigin: "top left",
+                    width: "920px",
+                    height: "640px",
+                  }}
+                >
+                  <div
+                    ref={certRef}
+                    className="w-[920px] h-[640px] bg-[#090a0f] relative overflow-hidden rounded-2xl border-4 border-aws-orange/80 shadow-[0_0_60px_rgba(0,0,0,0.9)] p-8 flex flex-col justify-between select-none"
                 style={{
                   backgroundImage: `radial-gradient(circle at 50% 30%, rgba(255, 153, 0, 0.06) 0%, transparent 70%), linear-gradient(135deg, #07080c 0%, #0d0f18 50%, #07080c 100%)`,
                 }}
@@ -534,6 +575,8 @@ export const CertificatePage = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
 
             {/* Customization Options & Download Controls */}
             <div className="w-full max-w-4xl mx-auto bg-[#0d0d12]/90 border border-white/10 rounded-2xl p-6 sm:p-8 shadow-xl backdrop-blur-md mt-6">

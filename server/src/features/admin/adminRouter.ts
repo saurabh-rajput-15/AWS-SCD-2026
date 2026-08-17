@@ -680,6 +680,26 @@ router.post('/shoutout', async (req, res, next) => {
           });
         }
       }
+    } else if (recipientSource === 'database_checked_in') {
+      const regs = await fetchAll((from, to) =>
+        supabase
+          .from('registrations')
+          .select('email, full_name')
+          .eq('payment_status', 'PAID')
+          .or('checked_in.eq.true,checked_in_at.not.is.null')
+          .range(from, to)
+      );
+      const seen = new Set<string>();
+      for (const r of regs || []) {
+        const email = (r.email || '').trim().toLowerCase();
+        if (email && emailRegex.test(email) && !seen.has(email)) {
+          seen.add(email);
+          targetRecipients.push({
+            email,
+            name: (r.full_name || '').trim() || email.split('@')[0],
+          });
+        }
+      }
     } else if (recipientSource === 'database_paid') {
       const regs = await fetchAll((from, to) =>
         supabase
@@ -749,9 +769,9 @@ router.post('/shoutout', async (req, res, next) => {
       return;
     }
 
-    // 3. Initialize Mailtrap Email Provider
+    // 3. Initialize Mailtrap/Resend Email Provider
     const { getEmailProvider } = await import('../../shared/lib/emailProvider.js');
-    let emailProviderInstance;
+    let emailProviderInstance: any;
     try {
       emailProviderInstance = getEmailProvider(provider || 'mailtrap');
     } catch (providerErr: any) {
