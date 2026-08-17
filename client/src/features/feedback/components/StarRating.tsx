@@ -41,9 +41,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
   const displayRating = hoverValue !== null ? hoverValue : value;
 
   const handleSelect = (starNumber: number) => {
-    // If clicking same star, reset to 0; otherwise select starNumber
-    const nextRating = starNumber === value ? 0 : starNumber;
-    onChange(nextRating);
+    onChange(starNumber);
     setHoverValue(null);
   };
 
@@ -68,11 +66,11 @@ export const StarRating: React.FC<StarRatingProps> = ({
         </div>
       )}
 
-      {/* 5 Stars Row - Instant Tap/Click on all devices */}
+      {/* 5 Stars Row */}
       <div
         role="radiogroup"
         aria-label={label || 'Rating selection'}
-        className="flex items-center gap-1.5 sm:gap-2 py-0.5 w-fit"
+        className="flex items-center gap-1 sm:gap-1.5 py-0.5 w-fit"
         onMouseLeave={() => setHoverValue(null)}
       >
         {Array.from({ length: max }, (_, index) => {
@@ -86,18 +84,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
               role="radio"
               aria-checked={value === starNumber}
               tabIndex={0}
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleSelect(starNumber);
-              }}
-              onPointerDown={(e) => {
-                // Instant touch response on mobile without waiting for click synthesizer
-                if (e.pointerType === 'touch') {
-                  e.stopPropagation();
-                  handleSelect(starNumber);
-                }
-              }}
+              onClick={() => handleSelect(starNumber)}
               onMouseEnter={() => setHoverValue(starNumber)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -105,7 +92,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
                   handleSelect(starNumber);
                 }
               }}
-              className={`p-1.5 rounded-lg transition-transform duration-75 active:scale-90 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-aws-orange/60 cursor-pointer touch-manipulation ${
+              className={`p-1.5 rounded-lg transition-transform duration-75 active:scale-90 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-aws-orange/60 cursor-pointer ${
                 isFilled
                   ? 'text-[#FF9900]'
                   : 'text-white/20 hover:text-white/40'
@@ -127,5 +114,6 @@ export const StarRating: React.FC<StarRatingProps> = ({
     </div>
   );
 };
+
 
 
