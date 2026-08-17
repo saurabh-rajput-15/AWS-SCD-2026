@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { toPng } from "html-to-image";
 import confetti from "canvas-confetti";
-import axios from "axios";
+import { api } from "../lib/api";
 import copy from "copy-to-clipboard";
 
 export const CertificatePage = () => {
@@ -149,7 +149,7 @@ export const CertificatePage = () => {
     setSearchError(null);
 
     try {
-      const res = await axios.get(
+      const res = await api.get(
         `/api/tickets/lookup?query=${encodeURIComponent(q)}`,
       );
       const attendee = res.data;
@@ -309,7 +309,7 @@ export const CertificatePage = () => {
             }}
             className="relative flex items-center bg-[#0d0d12] border border-white/15 focus-within:border-aws-orange rounded-xl p-1.5 shadow-xl transition-all"
           >
-            <div className="pl-3.5 pr-2 text-white/40">
+            <div className="pl-3.5 pr-2 text-white/40 ">
               <Search size={18} />
             </div>
             <input
@@ -317,13 +317,13 @@ export const CertificatePage = () => {
               placeholder="Enter registered email or Ticket ID (e.g. SCD-271365-26)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-transparent font-mono text-xs sm:text-sm text-white placeholder-white/30 focus:outline-none py-2.5"
+              className="w-full bg-transparent font-mono text-xs sm:text-sm text-white placeholder-white/30 focus:outline-none py-2.5 rounded-md"
               required
             />
             <button
               type="submit"
               disabled={searching}
-              className="px-5 py-2.5 bg-aws-orange hover:bg-white text-black font-sans font-black italic uppercase text-xs tracking-wider rounded-lg transition-all shrink-0 cursor-pointer flex items-center gap-1.5"
+              className="ml-2 px-5 py-2.5 bg-aws-orange hover:bg-white text-black font-sans font-black italic uppercase text-xs tracking-wider rounded-lg transition-all shrink-0 cursor-pointer flex items-center gap-1.5"
             >
               {searching ? (
                 <Loader2 size={14} className="animate-spin" />
