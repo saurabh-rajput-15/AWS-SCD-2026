@@ -60,7 +60,7 @@ export const FeedbackStepSessions: React.FC<FeedbackStepSessionsProps> = ({
     const updated = sessions.map(s => ({
       ...s,
       attended: true,
-      rating: s.rating === 0 ? 5 : s.rating
+      rating: s.rating
     }));
     onChange(updated);
   };

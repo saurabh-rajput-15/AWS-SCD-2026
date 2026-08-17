@@ -9,7 +9,7 @@ import { FeedbackStepFinal } from '../components/FeedbackStepFinal';
 import { FeedbackSuccess } from '../components/FeedbackSuccess';
 import { ArrowLeft, ArrowRight, Check, Sparkles, Utensils, MessageSquare, Mic, User, AlertTriangle } from 'lucide-react';
 
-const DRAFT_STORAGE_KEY = 'aws_scd_feedback_draft_v3';
+const DRAFT_STORAGE_KEY = 'aws_scd_feedback_draft_v5';
 
 const INITIAL_MORNING_SESSIONS: SessionFeedbackItem[] = [
   {
@@ -19,8 +19,8 @@ const INITIAL_MORNING_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Inauguration',
     tagsPool: ['🎉 Great Energy', '🤝 Warm Welcome', '⚡ Well Coordinated', '📌 Informative'],
     attended: true,
-    rating: 5,
-    tags: ['🎉 Great Energy'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -30,8 +30,8 @@ const INITIAL_MORNING_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Community Keynote',
     tagsPool: ['🚀 Inspiring', '💡 Career Guidance', '📚 Great Cert Tips', '🔥 High Energy'],
     attended: true,
-    rating: 5,
-    tags: ['🚀 Inspiring'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -41,8 +41,8 @@ const INITIAL_MORNING_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Technical Keynote',
     tagsPool: ['💡 Deep Architecture', '💻 Hands-on Insights', '⚡ Excellent Delivery', '🔥 Highly Relevant'],
     attended: true,
-    rating: 5,
-    tags: ['💡 Deep Architecture', '⚡ Excellent Delivery'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -52,8 +52,8 @@ const INITIAL_MORNING_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Deep Dive',
     tagsPool: ['⚙️ Clear Compute Concepts', '🧩 Great Container Tips', '💡 Real-world Examples', '👌 Well Paced'],
     attended: true,
-    rating: 5,
-    tags: ['⚙️ Clear Compute Concepts'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -63,8 +63,8 @@ const INITIAL_MORNING_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Deep Dive',
     tagsPool: ['🗄️ Great S3 & DynamoDB Tips', '📈 Scaling Advice', '💡 Clear Explanation', '🔥 Highly Engaging'],
     attended: true,
-    rating: 5,
-    tags: ['🗄️ Great S3 & DynamoDB Tips'],
+    rating: 0,
+    tags: [],
     comment: ''
   }
 ];
@@ -77,8 +77,8 @@ const INITIAL_AFTERNOON_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Deep Dive',
     tagsPool: ['🛠️ Super Practical', '🚀 Inspiring Hero', '💡 Great CI/CD Advice', '🔥 Outstanding'],
     attended: true,
-    rating: 5,
-    tags: ['🛠️ Super Practical', '🚀 Inspiring Hero'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -88,8 +88,8 @@ const INITIAL_AFTERNOON_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'AI Deep Dive',
     tagsPool: ['🤖 Mindblowing GenAI', '💡 Practical Bedrock Demos', '⚡ Cutting-Edge', '🔥 Best Session'],
     attended: true,
-    rating: 5,
-    tags: ['🤖 Mindblowing GenAI'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -99,8 +99,8 @@ const INITIAL_AFTERNOON_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Security Deep Dive',
     tagsPool: ['🔒 Essential Security Rules', '🛡️ Clear IAM Tips', '💡 Great Best Practices', '👌 Crisp & Clear'],
     attended: true,
-    rating: 5,
-    tags: ['🔒 Essential Security Rules'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -110,8 +110,8 @@ const INITIAL_AFTERNOON_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Panel Discussion',
     tagsPool: ['🌟 Inspiring Journeys', '💪 Empowering', '💼 Real Career Wisdom', '🔥 Outstanding Panel'],
     attended: true,
-    rating: 5,
-    tags: ['🌟 Inspiring Journeys', '💪 Empowering'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -121,8 +121,8 @@ const INITIAL_AFTERNOON_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Interactive Quiz',
     tagsPool: ['🏆 Super Fun', '🎁 Loved the Swags', '⚡ Fast & Competitive', '👏 Great Energy'],
     attended: true,
-    rating: 5,
-    tags: ['🏆 Super Fun', '🎁 Loved the Swags'],
+    rating: 0,
+    tags: [],
     comment: ''
   },
   {
@@ -132,8 +132,8 @@ const INITIAL_AFTERNOON_SESSIONS: SessionFeedbackItem[] = [
     sessionType: 'Chequered Flag',
     tagsPool: ['❤️ Heartwarming', '📸 Great Group Photo', '🤝 Looking forward to 2027', '👏 Great Team'],
     attended: true,
-    rating: 5,
-    tags: ['👏 Great Team'],
+    rating: 0,
+    tags: [],
     comment: ''
   }
 ];
@@ -144,10 +144,10 @@ const INITIAL_FOOD_DATA: FoodFeedbackData = {
     mealTitle: 'Breakfast & Morning Refreshments',
     menuDescription: 'Poha, Upma, Tea, Coffee & Morning Refreshments',
     attended: true,
-    tasteRating: 4,
-    freshnessRating: 4,
-    serviceRating: 4,
-    tags: ['🔥 Hot & Fresh', '☕ Good Tea/Coffee'],
+    tasteRating: 0,
+    freshnessRating: 0,
+    serviceRating: 0,
+    tags: [],
     comment: '',
     suggestedTags: [
       '🔥 Hot & Fresh',
@@ -164,10 +164,10 @@ const INITIAL_FOOD_DATA: FoodFeedbackData = {
     mealTitle: 'Grand Lunch Buffet',
     menuDescription: 'Full Course Lunch Meal: Paneer sabji, Dal, Hot Rotis, Jeera Rice, Salad, Sweet & Accompaniments',
     attended: true,
-    tasteRating: 4,
-    freshnessRating: 4,
-    serviceRating: 4,
-    tags: ['🍲 Tasty Paneer/Dal', '🥞 Hot Rotis'],
+    tasteRating: 0,
+    freshnessRating: 0,
+    serviceRating: 0,
+    tags: [],
     comment: '',
     suggestedTags: [
       '🍲 Tasty Paneer/Dal',
@@ -185,10 +185,10 @@ const INITIAL_FOOD_DATA: FoodFeedbackData = {
     mealTitle: 'Evening High-Tea & Snacks',
     menuDescription: 'Crispy Evening Snacks, Hot Masala Chai & Coffee',
     attended: true,
-    tasteRating: 4,
-    freshnessRating: 4,
-    serviceRating: 4,
-    tags: ['☕ Great Masala Chai', '🍪 Crispy Snacks'],
+    tasteRating: 0,
+    freshnessRating: 0,
+    serviceRating: 0,
+    tags: [],
     comment: '',
     suggestedTags: [
       '☕ Great Masala Chai',
@@ -199,7 +199,7 @@ const INITIAL_FOOD_DATA: FoodFeedbackData = {
       '👌 Quick Service'
     ]
   },
-  overallCanteenRating: 4,
+  overallCanteenRating: 0,
   canteenSuggestion: ''
 };
 
@@ -207,10 +207,10 @@ const INITIAL_FORM_DATA: FeedbackFormData = {
   attendeeName: '',
   email: '',
   isAnonymous: false,
-  overallRating: 5,
-  venueRating: 5,
-  organizationRating: 5,
-  generalImpressions: ['⚡ High Energy & Vibe', '🚀 Inspiring Keynotes'],
+  overallRating: 0,
+  venueRating: 0,
+  organizationRating: 0,
+  generalImpressions: [],
   morningSessions: INITIAL_MORNING_SESSIONS,
   afternoonSessions: INITIAL_AFTERNOON_SESSIONS,
   foodFeedback: INITIAL_FOOD_DATA,

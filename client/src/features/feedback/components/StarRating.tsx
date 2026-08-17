@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState } from 'react';
 import { Star } from 'lucide-react';
 
 interface StarRatingProps {
@@ -31,8 +31,6 @@ export const StarRating: React.FC<StarRatingProps> = ({
   className = ''
 }) => {
   const [hoverValue, setHoverValue] = useState<number | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const isDraggingRef = useRef(false);
 
   const starSizes = {
     sm: 'w-4 h-4 sm:w-5 sm:h-5',
@@ -42,61 +40,11 @@ export const StarRating: React.FC<StarRatingProps> = ({
 
   const displayRating = hoverValue !== null ? hoverValue : value;
 
-  const computeStarIndex = useCallback((clientX: number): number => {
-    if (!containerRef.current) return 0;
-    const rect = containerRef.current.getBoundingClientRect();
-    if (rect.width === 0) return 0;
-    const relativeX = clientX - rect.left;
-    const clampedX = Math.max(0, Math.min(relativeX, rect.width));
-    const star = Math.min(max, Math.max(1, Math.ceil((clampedX / rect.width) * max)));
-    return star;
-  }, [max]);
-
-  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    try {
-      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
-    } catch {
-      // fallback
-    }
-    isDraggingRef.current = true;
-    const star = computeStarIndex(e.clientX);
-    if (star > 0) {
-      setHoverValue(star);
-    }
-  };
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const star = computeStarIndex(e.clientX);
-    if (star > 0 && star !== hoverValue) {
-      setHoverValue(star);
-    }
-  };
-
-  const handlePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (isDraggingRef.current) {
-      const star = computeStarIndex(e.clientX);
-      if (star > 0) {
-        onChange(star === value ? 0 : star);
-      }
-      isDraggingRef.current = false;
-      setHoverValue(null);
-    }
-    try {
-      (e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId);
-    } catch {
-      // fallback
-    }
-  };
-
-  const handlePointerCancel = () => {
-    isDraggingRef.current = false;
+  const handleSelect = (starNumber: number) => {
+    // If clicking same star, reset to 0; otherwise select starNumber
+    const nextRating = starNumber === value ? 0 : starNumber;
+    onChange(nextRating);
     setHoverValue(null);
-  };
-
-  const handlePointerLeave = () => {
-    if (!isDraggingRef.current) {
-      setHoverValue(null);
-    }
   };
 
   return (
@@ -110,7 +58,7 @@ export const StarRating: React.FC<StarRatingProps> = ({
             </span>
           ) : (
             <span className="font-mono text-[10px] text-white/40 uppercase tracking-wider">
-              {displayRating > 0 ? `${displayRating}/${max} Stars` : 'Rate: 1 to 5'}
+              {displayRating > 0 ? `${displayRating}/${max} Stars` : 'Tap to rate'}
             </span>
           )}
 
@@ -120,17 +68,12 @@ export const StarRating: React.FC<StarRatingProps> = ({
         </div>
       )}
 
-      {/* 5 Stars Interactive Row */}
+      {/* 5 Stars Row - Instant Tap/Click on all devices */}
       <div
-        ref={containerRef}
         role="radiogroup"
         aria-label={label || 'Rating selection'}
-        className="flex items-center gap-1 sm:gap-1.5 touch-none cursor-pointer py-0.5 w-fit"
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerCancel}
-        onPointerLeave={handlePointerLeave}
+        className="flex items-center gap-1.5 sm:gap-2 py-0.5 w-fit"
+        onMouseLeave={() => setHoverValue(null)}
       >
         {Array.from({ length: max }, (_, index) => {
           const starNumber = index + 1;
@@ -144,16 +87,25 @@ export const StarRating: React.FC<StarRatingProps> = ({
               aria-checked={value === starNumber}
               tabIndex={0}
               onClick={(e) => {
+                e.preventDefault();
                 e.stopPropagation();
-                onChange(starNumber === value ? 0 : starNumber);
+                handleSelect(starNumber);
               }}
+              onPointerDown={(e) => {
+                // Instant touch response on mobile without waiting for click synthesizer
+                if (e.pointerType === 'touch') {
+                  e.stopPropagation();
+                  handleSelect(starNumber);
+                }
+              }}
+              onMouseEnter={() => setHoverValue(starNumber)}
               onKeyDown={(e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
-                  onChange(starNumber === value ? 0 : starNumber);
+                  handleSelect(starNumber);
                 }
               }}
-              className={`p-1 rounded-md transition-transform duration-75 hover:scale-115 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-aws-orange/60 cursor-pointer ${
+              className={`p-1.5 rounded-lg transition-transform duration-75 active:scale-90 hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-aws-orange/60 cursor-pointer touch-manipulation ${
                 isFilled
                   ? 'text-[#FF9900]'
                   : 'text-white/20 hover:text-white/40'
@@ -175,4 +127,5 @@ export const StarRating: React.FC<StarRatingProps> = ({
     </div>
   );
 };
+
 
