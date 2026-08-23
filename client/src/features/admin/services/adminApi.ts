@@ -97,4 +97,32 @@ export const adminApi = {
 
   deleteFeedback: (id: string) =>
     api.delete(`/api/admin/feedback/${id}`, { headers: getHeaders() }),
+
+  // Merch Orders Management
+  getMerchOrders: (filters?: {
+    search?: string;
+    payment_status?: string;
+    status?: string;
+    delivery_option_id?: string;
+    product_id?: string;
+    page?: number;
+    limit?: number;
+  }) => api.get('/api/admin/merch-orders', { headers: getHeaders(), params: filters }),
+
+  updateMerchOrderStatus: (id: string, data: { status?: string; expected_delivery_date?: string; notes?: string }) =>
+    api.put(`/api/admin/merch-orders/${id}/status`, data, { headers: getHeaders() }),
+
+  exportMerchOrders: () =>
+    api.get('/api/admin/export-merch-orders', {
+      headers: getHeaders(),
+      responseType: 'blob',
+    }),
+
+  deleteMerchOrder: (id: string) =>
+    api.delete(`/api/admin/merch-orders/${id}`, { headers: getHeaders() }),
+
+  getMerchStats: () => api.get('/api/admin/merch-stats', { headers: getHeaders() }),
+
+  updateMerchInventory: (inventory: Record<string, number>) =>
+    api.put('/api/admin/merch-inventory', { inventory }, { headers: getHeaders() }),
 };

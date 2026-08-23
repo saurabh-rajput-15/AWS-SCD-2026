@@ -55,12 +55,12 @@ export function PassTypeSelector({ loading }: Props) {
         </div>
 
         <div className="mt-5 flex flex-wrap gap-3 justify-center">
-          <a
-            href="/#store"
+          <Link
+            to="/merchstore"
             className="px-6 py-2.5 bg-aws-orange text-black font-sans font-black italic uppercase text-xs tracking-widest skew-x-[-6deg] hover:bg-white transition-all shadow-[0_0_15px_rgba(255,153,0,0.3)]"
           >
-            <span className="skew-x-[6deg] block">Get Merch Combo</span>
-          </a>
+            <span className="skew-x-[6deg] block">Get Merch</span>
+          </Link>
           <Link
             to="/"
             className="px-6 py-2.5 bg-white/10 hover:bg-white/20 transition-colors font-mono text-xs uppercase tracking-widest border border-white/20 text-white"

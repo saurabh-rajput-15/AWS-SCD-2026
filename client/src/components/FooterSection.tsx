@@ -7,7 +7,7 @@ const quickLinks = [
   { label: 'Speakers', href: '#speakers' },
   { label: 'Certificate', href: '/certificate' },
   { label: 'Feedback Form', href: '/feedback' },
-  { label: 'Merch Store', href: '#store' },
+  { label: 'Merch Store', href: '/merchstore' },
   { label: 'Sponsors', href: '#sponsors' },
   { label: 'FAQ', href: '#faq' },
   { label: 'Refer & Win', href: '/refertowin' },

@@ -1,10 +1,10 @@
-export const otpEmailTemplate = `<!doctype html>
+export const merchOtpEmailTemplate = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>
-      Your Ticket is Confirmed — AWS Student Community Day Dhule 2026
+      Verify Your Email — AWS SCD Dhule 2026 Official Merch Store
     </title>
   </head>
   <body
@@ -74,7 +74,7 @@ export const otpEmailTemplate = `<!doctype html>
                     text-transform: uppercase;
                   "
                 >
-                  Dhule &nbsp;·&nbsp; 2026
+                  Official Merchandise Store &nbsp;·&nbsp; Dhule 2026
                 </p>
               </td>
             </tr>
@@ -94,8 +94,7 @@ export const otpEmailTemplate = `<!doctype html>
                     color: #4b5563;
                   "
                 >
-                  Use the verification code below to continue your registration
-                  or sign-in process.
+                  Thank you for ordering official merchandise from <strong>AWS Student Community Day Dhule 2026</strong>! Use the verification code below to verify your email address and confirm your order checkout.
                 </p>
 
                 <!-- OTP Box -->
@@ -122,7 +121,7 @@ export const otpEmailTemplate = `<!doctype html>
                             letter-spacing: 1px;
                           "
                         >
-                          Verification Code
+                          Merch Checkout Verification Code
                         </p>
 
                         <p
@@ -158,7 +157,7 @@ export const otpEmailTemplate = `<!doctype html>
                   share this code with anyone.
                 </p>
 
-                <!-- Security Notice -->
+                <!-- Merchandise Order Info Note -->
                 <table
                   width="100%"
                   cellpadding="0"
@@ -166,24 +165,56 @@ export const otpEmailTemplate = `<!doctype html>
                   border="0"
                   style="
                     margin-top: 24px;
+                    background: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 8px;
+                  "
+                >
+                  <tr>
+                    <td style="padding: 16px 18px">
+                      <p style="margin: 0 0 8px 0; font-size: 13px; font-weight: bold; color: #1e293b;">
+                        🛍️ What happens after email verification?
+                      </p>
+                      <p
+                        style="
+                          margin: 0;
+                          font-size: 12.5px;
+                          color: #475569;
+                          line-height: 1.6;
+                        "
+                      >
+                        • Your order token is securely recorded in the official database.<br/>
+                        • You will receive instant WhatsApp order dispatch confirmation.<br/>
+                        • Free self-pickup is available at SVKM IOT Dhule Campus, or express delivery as selected.
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Security Notice -->
+                <table
+                  width="100%"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  style="
+                    margin-top: 16px;
                     background: #f9fafb;
                     border: 1px solid #e5e7eb;
                     border-radius: 8px;
                   "
                 >
                   <tr>
-                    <td style="padding: 16px 18px">
+                    <td style="padding: 14px 18px">
                       <p
                         style="
                           margin: 0;
-                          font-size: 13px;
+                          font-size: 12.5px;
                           color: #4b5563;
-                          line-height: 1.7;
+                          line-height: 1.6;
                         "
                       >
-                        🔒 For your security, AWS Student Community Day will
-                        never ask for your verification code via email, phone,
-                        or social media.
+                        🔒 For your security, the AWS SCD Dhule team will never ask for your password or verification OTP outside of this secure checkout session.
                       </p>
                     </td>
                   </tr>
@@ -208,7 +239,7 @@ export const otpEmailTemplate = `<!doctype html>
                       "
                     >
                       <p style="margin: 0; font-size: 13px; color: #6b7280">
-                        Questions? Reach us at
+                        Questions regarding your merch order? Reach us at
                         <a
                           href="mailto:info@aws-scd-dhule.tech"
                           style="
@@ -252,7 +283,7 @@ export const otpEmailTemplate = `<!doctype html>
                   AWS Student Community Day Dhule 2026
                 </p>
                 <p style="margin: 6px 0 0; color: #9ca3af; font-size: 12px">
-                  Building the next generation of cloud innovators.
+                  Official Merchandise &amp; Builder Collectibles Desk
                 </p>
                 <p style="margin: 16px 0 0; color: #4b5563; font-size: 11px">
                   © 2026 AWS Student Community Day Dhule. All rights reserved.

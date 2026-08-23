@@ -55,23 +55,44 @@ router.put('/settings', async (req, res, next) => {
   try {
     const { registration_enabled } = req.body;
     
-    // Upsert the single row (we can just update the first row or delete all and insert one)
-    // Since we know there's one row, we can just update without a specific ID if we use a trick, 
-    // or we can delete all and insert one. Let's delete all and insert one to be safe.
-    await supabase.from('app_settings').delete().not('id', 'is', null);
-    
-    const { data, error } = await supabase
+    const { data: existing } = await supabase
       .from('app_settings')
-      .insert({ registration_enabled })
-      .select()
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
       .single();
 
-    if (error) throw error;
-    res.json(data);
+    let updated;
+    if (existing) {
+      const { data, error } = await supabase
+        .from('app_settings')
+        .update({
+          registration_enabled: !!registration_enabled,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (error) throw error;
+      updated = data;
+    } else {
+      const { data, error } = await supabase
+        .from('app_settings')
+        .insert({
+          registration_enabled: !!registration_enabled
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      updated = data;
+    }
+
+    res.json(updated);
   } catch (err) {
     next(err);
   }
 });
+
 // Promo Codes Management
 
 router.get('/promo-codes', async (_req, res, next) => {
@@ -1482,6 +1503,466 @@ router.delete('/feedback/:id', async (req, res, next) => {
     next(err);
   }
 });
+
+// ==========================================
+// Merch Orders Management
+// ==========================================
+
+// Helper to clean up and archive unpaid draft merch orders older than 15 minutes
+async function archiveExpiredUnpaidMerchOrders() {
+  try {
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+
+    const { data: expiredOrders, error: findError } = await supabase
+      .from('merch_orders')
+      .select('*')
+      .eq('payment_status', 'PENDING')
+      .lt('created_at', fifteenMinutesAgo);
+
+    if (findError || !expiredOrders || expiredOrders.length === 0) return;
+
+    const expiredIds = expiredOrders.map((o) => o.id);
+
+    const archivePayload = expiredOrders.map((o) => ({
+      ...o,
+      archived_at: new Date().toISOString(),
+      archived_reason: 'UNPAID_EXPIRED_15MIN'
+    }));
+
+    try {
+      await supabase.from('archived_merch_orders').insert(archivePayload);
+    } catch {
+      try {
+        await supabase.from('archievedcart').insert(archivePayload);
+      } catch {
+        // Table fallback
+      }
+    }
+
+    await supabase
+      .from('merch_orders')
+      .delete()
+      .in('id', expiredIds);
+
+    console.log(`[Merch Orders Cleanup] Archived and removed ${expiredIds.length} unpaid orders older than 15 min.`);
+  } catch (err) {
+    console.error('[Merch Orders Cleanup Error]', err);
+  }
+}
+
+function calculate5DaysNext(createdAtStr?: string): string {
+  const base = createdAtStr ? new Date(createdAtStr) : new Date();
+  const target = new Date(base.getTime() + 5 * 24 * 60 * 60 * 1000);
+  return target.toISOString().split('T')[0];
+}
+
+// GET /api/admin/merch-orders - List and filter merch orders
+router.get('/merch-orders', async (req, res, next) => {
+  try {
+    // 1. Auto-cleanup unpaid orders older than 15 minutes
+    await archiveExpiredUnpaidMerchOrders();
+
+    const {
+      search,
+      payment_status,
+      status,
+      delivery_option_id,
+      product_id,
+      page = 1,
+      limit = 50
+    } = req.query;
+
+    const pageNum = Math.max(1, Number(page));
+    const limitNum = Math.min(100, Math.max(1, Number(limit)));
+    const offset = (pageNum - 1) * limitNum;
+
+    let query = supabase
+      .from('merch_orders')
+      .select('*', { count: 'exact' });
+
+    if (payment_status && typeof payment_status === 'string') {
+      query = query.eq('payment_status', payment_status.toUpperCase());
+    }
+
+    if (status && typeof status === 'string') {
+      query = query.eq('status', status.toUpperCase());
+    }
+
+    if (delivery_option_id && typeof delivery_option_id === 'string') {
+      query = query.eq('delivery_option_id', delivery_option_id);
+    }
+
+    if (product_id && typeof product_id === 'string') {
+      query = query.eq('product_id', product_id);
+    }
+
+    if (search && typeof search === 'string') {
+      const s = search.trim();
+      query = query.or(`order_ref.ilike.%${s}%,customer_name.ilike.%${s}%,customer_email.ilike.%${s}%,customer_phone.ilike.%${s}%,city.ilike.%${s}%`);
+    }
+
+    const { data: rawOrders, count, error } = await query
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limitNum - 1);
+
+    if (error) throw error;
+
+    // Attach system-generated 5-day default delivery date if not set
+    const orders = (rawOrders || []).map((o) => ({
+      ...o,
+      expected_delivery_date: o.expected_delivery_date || calculate5DaysNext(o.created_at)
+    }));
+
+    res.json({
+      orders,
+      total: count || 0,
+      page: pageNum,
+      limit: limitNum,
+      totalPages: Math.ceil((count || 0) / limitNum)
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/archived-merch-orders - View archived unpaid cart orders
+router.get('/archived-merch-orders', async (_req, res, next) => {
+  try {
+    const { data, error } = await supabase
+      .from('archived_merch_orders')
+      .select('*')
+      .order('archived_at', { ascending: false })
+      .limit(100);
+
+    if (error) {
+      // Fallback try archievedcart
+      const { data: cartData } = await supabase
+        .from('archievedcart')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(100);
+      return res.json({ archived: cartData || [] });
+    }
+
+    res.json({ archived: data || [] });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /api/admin/merch-orders/:id/status - Update order fulfillment status & expected delivery date
+// NOTE: Admin CANNOT manipulate payment_status (PAID/UNPAID/PENDING). It is strictly payment gateway verified.
+router.put('/merch-orders/:id/status', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { status, expected_delivery_date, notes } = req.body;
+
+    const updates: Record<string, any> = {
+      updated_at: new Date().toISOString()
+    };
+
+    // Admin can update fulfillment status (PROCESSING, DISPATCHED, DELIVERED, CANCELLED)
+    if (status) updates.status = String(status).toUpperCase();
+    if (expected_delivery_date !== undefined) updates.expected_delivery_date = expected_delivery_date;
+    if (notes !== undefined) updates.notes = notes;
+
+    const { data, error } = await supabase
+      .from('merch_orders')
+      .update(updates)
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    res.json({
+      success: true,
+      order: {
+        ...data,
+        expected_delivery_date: data.expected_delivery_date || calculate5DaysNext(data.created_at)
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/export-merch-orders - Export all merch orders to CSV
+router.get('/export-merch-orders', async (_req, res, next) => {
+  try {
+    await archiveExpiredUnpaidMerchOrders();
+
+    const { data: orders, error } = await supabase
+      .from('merch_orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+
+    const headers = 'Order Ref,Customer Name,Email,Phone,Product Title,Product ID,Quantity,Unit Price,Subtotal,Delivery Option,Delivery Fee,Total Amount,Payment Status,Fulfillment Status,Expected Delivery Date,Razorpay Order ID,Razorpay Payment ID,Delivery Address,City,State,Pincode,Order Date,Paid Date';
+    
+    const rows = (orders || []).map((o) =>
+      [
+        o.order_ref || '',
+        o.customer_name || '',
+        o.customer_email || '',
+        o.customer_phone || '',
+        o.product_title || '',
+        o.product_id || '',
+        o.quantity || 1,
+        o.unit_price || 0,
+        o.subtotal || 0,
+        o.delivery_option_name || '',
+        o.delivery_charge || 0,
+        o.total_amount || 0,
+        o.payment_status || 'PENDING',
+        o.status || 'PENDING',
+        o.expected_delivery_date || calculate5DaysNext(o.created_at),
+        o.razorpay_order_id || '',
+        o.razorpay_payment_id || '',
+        o.delivery_address || '',
+        o.city || '',
+        o.state || '',
+        o.pincode || '',
+        o.created_at || '',
+        o.paid_at || ''
+      ]
+        .map((v) => `"${String(v).replace(/"/g, '""')}"`)
+        .join(',')
+    );
+
+    const csv = [headers, ...rows].join('\n');
+    const date = new Date().toISOString().split('T')[0];
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=scd-merch-orders-${date}.csv`);
+    res.send(csv);
+  } catch (err) {
+    next(err);
+  }
+});
+
+// DELETE /api/admin/merch-orders/:id - Delete a merch order
+router.delete('/merch-orders/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { error } = await supabase
+      .from('merch_orders')
+      .delete()
+      .eq('id', id);
+
+    if (error) throw error;
+    res.json({ success: true, message: 'Merch order deleted' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// GET /api/admin/merch-stats - Merchandise Sales & Inventory Overview
+router.get('/merch-stats', async (_req, res, next) => {
+  try {
+    // 1. Fetch inventory stock settings from merch_inventory table (with fallback to app_settings)
+    let inventoryConfig: Record<string, number> = {
+      'bag': 150,
+      'welcome-kit': 150,
+      'combo': 200
+    };
+
+    try {
+      const { data: tableData, error: tableErr } = await supabase
+        .from('merch_inventory')
+        .select('*');
+
+      if (!tableErr && tableData && tableData.length > 0) {
+        tableData.forEach((row: any) => {
+          inventoryConfig[row.id] = Number(row.capacity) || 0;
+        });
+      } else {
+        const { data: settingsData } = await supabase
+          .from('app_settings')
+          .select('merch_inventory')
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single();
+
+        if (settingsData?.merch_inventory) {
+          inventoryConfig = { ...inventoryConfig, ...settingsData.merch_inventory };
+        }
+      }
+    } catch (invErr) {
+      console.warn('[Merch Inventory Fetch Notice]', invErr);
+    }
+
+    // 2. Fetch all paid merch orders
+    const { data: paidOrders, error } = await supabase
+      .from('merch_orders')
+      .select('*')
+      .eq('payment_status', 'PAID');
+
+    if (error) throw error;
+
+    let total_revenue = 0;
+    let total_orders = (paidOrders || []).length;
+    let total_units_sold = 0;
+    let delivery_fees_collected = 0;
+
+    const by_product: Record<string, { sold: number; revenue: number; capacity: number; title: string }> = {
+      'bag': {
+        sold: 0,
+        revenue: 0,
+        capacity: Number(inventoryConfig['bag']) || 150,
+        title: 'SCD Official Bag + Bottle'
+      },
+      'welcome-kit': {
+        sold: 0,
+        revenue: 0,
+        capacity: Number(inventoryConfig['welcome-kit']) || 150,
+        title: 'SCD Official Welcome Kit'
+      },
+      'combo': {
+        sold: 0,
+        revenue: 0,
+        capacity: Number(inventoryConfig['combo']) || 200,
+        title: 'SCD Bag + Welcome Kit Combo'
+      }
+    };
+
+    const fulfillment_breakdown: Record<string, number> = {
+      'PAID': 0,
+      'PROCESSING': 0,
+      'DISPATCHED': 0,
+      'DELIVERED': 0,
+      'CANCELLED': 0
+    };
+
+    const delivery_mode_breakdown: Record<string, number> = {};
+
+    (paidOrders || []).forEach((o) => {
+      const pId = o.product_id || 'combo';
+      const qty = Number(o.quantity) || 1;
+      const fee = Number(o.delivery_charge) || 0;
+      // Actual transaction amount paid by user in this order
+      const amount = Number(o.total_amount) || (Number(o.subtotal || 0) + fee);
+      // Item revenue after promo discount
+      const itemRevenue = Math.max(0, amount - fee);
+
+      total_revenue += amount;
+      total_units_sold += qty;
+      delivery_fees_collected += fee;
+
+      if (!by_product[pId]) {
+        by_product[pId] = {
+          sold: 0,
+          revenue: 0,
+          capacity: Number(inventoryConfig[pId]) || 100,
+          title: o.product_title || pId
+        };
+      }
+      by_product[pId].sold += qty;
+      by_product[pId].revenue += itemRevenue;
+
+      const st = (o.status || 'PAID').toUpperCase();
+      fulfillment_breakdown[st] = (fulfillment_breakdown[st] || 0) + 1;
+
+      const delName = o.delivery_option_name || 'Campus Pickup';
+      delivery_mode_breakdown[delName] = (delivery_mode_breakdown[delName] || 0) + 1;
+    });
+
+    const products = Object.entries(by_product).map(([id, info]) => ({
+      id,
+      title: info.title,
+      sold: info.sold,
+      capacity: info.capacity,
+      remaining: Math.max(0, info.capacity - info.sold),
+      revenue: Number(info.revenue.toFixed(2))
+    }));
+
+    const total_capacity = products.reduce((acc, p) => acc + p.capacity, 0);
+
+    res.json({
+      total_revenue: Number(total_revenue.toFixed(2)),
+      total_orders,
+      total_units_sold,
+      total_capacity,
+      remaining_inventory: Math.max(0, total_capacity - total_units_sold),
+      delivery_fees_collected: Number(delivery_fees_collected.toFixed(2)),
+      by_product: products,
+      fulfillment_breakdown,
+      delivery_mode_breakdown
+    });
+
+  } catch (err) {
+    next(err);
+  }
+});
+
+// PUT /api/admin/merch-inventory - Update product stock inventory capacities directly in DB
+router.put('/merch-inventory', async (req, res, next) => {
+  try {
+    const { inventory } = req.body;
+    if (!inventory || typeof inventory !== 'object') {
+      return res.status(400).json({ error: 'Invalid inventory configuration object' });
+    }
+
+    const productTitles: Record<string, string> = {
+      'bag': 'SCD Official Bag + Bottle',
+      'welcome-kit': 'SCD Official Welcome Kit',
+      'combo': 'SCD Bag + Welcome Kit Combo'
+    };
+
+    // 1. Update/Upsert in dedicated merch_inventory table
+    for (const [pId, cap] of Object.entries(inventory)) {
+      try {
+        await supabase
+          .from('merch_inventory')
+          .upsert({
+            id: pId,
+            title: productTitles[pId] || pId,
+            capacity: Number(cap),
+            updated_at: new Date().toISOString()
+          });
+      } catch (upsertErr) {
+        console.warn(`[merch_inventory upsert notice for ${pId}]`, upsertErr);
+      }
+    }
+
+    // 2. Also backup to app_settings
+    const { data: existing } = await supabase
+      .from('app_settings')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single();
+
+    let updated;
+    if (existing) {
+      const { data, error } = await supabase
+        .from('app_settings')
+        .update({
+          merch_inventory: inventory,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (!error) updated = data;
+    } else {
+      const { data, error } = await supabase
+        .from('app_settings')
+        .insert({
+          registration_enabled: true,
+          merch_inventory: inventory
+        })
+        .select()
+        .single();
+      if (!error) updated = data;
+    }
+
+    res.json({ success: true, merch_inventory: inventory });
+  } catch (err) {
+    next(err);
+  }
+});
+
 
 export default router;
 

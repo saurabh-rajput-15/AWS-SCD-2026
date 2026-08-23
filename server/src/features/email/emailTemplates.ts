@@ -40,7 +40,7 @@ export function buildRegistrationConfirmationEmail(data: ConfirmationEmailData):
 
               <!-- Logo centered -->
               <img
-                src="https://aws-scd-dhule.tech/scd-dhule-logo.avif"
+                src="https://aws-scd-dhule.tech/scd-dhule-logo.png"
                 alt="AWS Student Community Day Dhule"
                 width="180"
                 style="display:block;margin:0 auto 16px;max-width:180px;"
@@ -467,7 +467,7 @@ export function buildGroupRegistrationConfirmationEmail(data: GroupConfirmationE
 
               <!-- Logo centered -->
               <img
-                src="https://aws-scd-dhule.tech/scd-dhule-logo.avif"
+                src="https://aws-scd-dhule.tech/scd-dhule-logo.png"
                 alt="AWS Student Community Day Dhule"
                 width="180"
                 style="display:block;margin:0 auto 16px;max-width:180px;"

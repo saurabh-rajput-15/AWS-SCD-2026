@@ -1,91 +1,125 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 import { SectionHeader } from './LayoutElements';
+import { merchProducts } from '../data/merchProducts';
 import {
   ShoppingBag,
-  PackageCheck,
-  Sparkles,
-  Phone,
-  Mail,
+  ArrowRight,
+  Star,
   CheckCircle2,
-  ExternalLink,
-  ShieldCheck,
+  Tag,
   Truck,
-  Flame,
-  Award,
-  Layers,
-  FileText
+  ShieldCheck,
+  Zap,
+  Gift
 } from 'lucide-react';
 
-interface ComboItem {
-  id: string;
+const ProductCardImage = ({
+  images,
+  title,
+  icon: Icon
+}: {
+  images: string[];
   title: string;
-  category: string;
-  description: string;
-  icon: typeof ShoppingBag;
-  tag: string;
-}
+  icon: any;
+}) => {
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isInView, setIsInView] = useState(false);
 
-const comboItems: ComboItem[] = [
-  {
-    id: 'bag',
-    title: 'SCD 2026 Paddock Bag',
-    category: 'Heavy-Duty Gear',
-    description: 'Custom racing-livery cloud builder bag crafted with durable, water-resistant fabric, laptop compartment & reinforced seams.',
-    icon: ShoppingBag,
-    tag: 'LIMITED RUN'
-  },
-  {
-    id: 'badge',
-    title: 'Commemorative Badge & Lanyard',
-    category: 'Paddock Pass Keepsake',
-    description: 'Official SCD Dhule 2026 metal collectible badge with high-density woven racing lanyard and custom clip.',
-    icon: Award,
-    tag: 'COLLECTIBLE'
-  },
-  {
-    id: 'stickers',
-    title: 'AWS Holographic Decal Pack',
-    category: 'Swag Pack',
-    description: 'Set of premium vinyl & holographic stickers including AWS Cloud architecture, SCD Dhule speed logos, and tech decals.',
-    icon: Sparkles,
-    tag: 'VINYL GLOSS'
-  },
-  {
-    id: 'notebook',
-    title: 'Cloud Architect Diary & Pen',
-    category: 'Engineering Station',
-    description: 'Hardcover grid-lined technical notebook for cloud diagrams, architecture sketching, and daily coding logs + sleek metal stylus pen.',
-    icon: FileText,
-    tag: 'OFFICIAL'
-  },
-  {
-    id: 'swag',
-    title: 'Collector Swag & Surprise Perks',
-    category: 'Bonus Collectibles',
-    description: 'Exclusive community builder collectible cards, pin badge, and partner voucher surprises packed inside the kit.',
-    icon: Layers,
-    tag: 'BONUS'
-  }
-];
+  // IntersectionObserver for mobile/touch screen auto-play when scrolled in view
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
 
-export const MerchandiseStoreSection = () => {
-  const [selectedItem, setSelectedItem] = useState<string>('bag');
-  const [copiedEmail, setCopiedEmail] = useState(false);
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsInView(entry.isIntersecting);
+      },
+      { threshold: 0.45 }
+    );
+    observer.observe(el);
 
-  const handleCopyEmail = () => {
-    navigator.clipboard.writeText('info@aws-scd-dhule.tech');
-    setCopiedEmail(true);
-    setTimeout(() => setCopiedEmail(false), 2000);
-  };
+    return () => observer.disconnect();
+  }, []);
 
-  const whatsappUrl = `https://wa.me/919834382337?text=${encodeURIComponent(
-    'Hi SCD Dhule Team! I would like to order the Official Bags & Welcome Kit Combo.'
-  )}`;
+  // Amazon/Flipkart 3-second cycle on hover (desktop) OR when in view (mobile/touch devices)
+  useEffect(() => {
+    if (images.length <= 1) return;
+
+    const isTouchDevice =
+      typeof window !== 'undefined' &&
+      !window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    const shouldRotate = isHovered || (isTouchDevice && isInView);
+
+    if (!shouldRotate) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % images.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [isHovered, isInView, images.length]);
 
   return (
-    <section id="store" className="relative py-20 sm:py-28 px-4 sm:px-12 lg:px-24 bg-[#050505] border-b border-white/5 overflow-hidden" aria-label="Merchandise Store">
-      {/* Dynamic ambient backgrounds */}
+    <div
+      ref={containerRef}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setActiveIdx(0);
+      }}
+      className="relative aspect-[4/3] rounded-xl overflow-hidden bg-black/60 border border-white/5"
+    >
+      <motion.img
+        key={activeIdx}
+        src={images[activeIdx]}
+        alt={title}
+        initial={{ opacity: 0.7 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-108"
+        loading="lazy"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-60 group-hover:opacity-40 transition-opacity pointer-events-none" />
+
+      {/* Progress Dots / Bars (Flipkart / Amazon style) */}
+      {images.length > 1 && (
+        <div className="absolute bottom-2.5 right-2.5 flex items-center gap-1 z-10">
+          {images.map((_, dotIdx) => (
+            <span
+              key={dotIdx}
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                dotIdx === activeIdx
+                  ? 'w-4 bg-aws-orange'
+                  : 'w-1.5 bg-white/35'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+
+      <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 bg-black/70 backdrop-blur-md rounded text-white/70 font-mono text-[9px] z-10">
+        <Icon size={11} className="text-aws-orange" />
+        <span>{activeIdx + 1}/{images.length} Photos</span>
+      </div>
+    </div>
+  );
+};
+
+export const MerchandiseStoreSection = () => {
+  return (
+    <section
+      id="store"
+      className="relative py-20 sm:py-28 px-4 sm:px-12 lg:px-24 bg-[#050505] border-b border-white/5 overflow-hidden"
+      aria-label="Merchandise Store"
+    >
+      {/* Background Ambience */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808005_1px,transparent_1px),linear-gradient(to_bottom,#80808005_1px,transparent_1px)] bg-[size:28px_28px] pointer-events-none" />
       <div className="absolute -top-10 left-1/4 w-[500px] h-[500px] bg-aws-orange/5 blur-[160px] rounded-full pointer-events-none" />
       <div className="absolute -bottom-10 right-1/4 w-[500px] h-[500px] bg-f1-red/5 blur-[160px] rounded-full pointer-events-none" />
@@ -95,247 +129,147 @@ export const MerchandiseStoreSection = () => {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6">
           <SectionHeader
             title="Merch Store"
-            subtitle="Take home the official SCD Dhule 2026 paddock collectibles. Post-event drop featuring our exclusive Bags & Welcome Kit combo."
+            subtitle="Official SCD Dhule 2026 paddock collectibles. Select any product below for full details, specifications, and fast dispatch."
             sysId="03.MRCH"
           />
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-aws-orange/10 border border-aws-orange/30 rounded-full font-mono text-[10px] sm:text-xs text-aws-orange uppercase tracking-wider font-bold shrink-0 self-start sm:self-auto">
             <span className="w-2 h-2 rounded-full bg-aws-orange animate-ping" />
-            <span>Limited Post-Event Stock</span>
+            <span>Official Post-Event Stock</span>
           </div>
         </div>
 
-        {/* Featured Combo Hero Card */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
-          
-          {/* Left Column: Interactive Product Console */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="lg:col-span-7 bg-[#0b0b0b] border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden shadow-[0_0_50px_rgba(0,0,0,0.6)]"
-          >
-            {/* Ambient edge glow line */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-f1-red via-aws-orange to-f1-red" />
-            
-            <div>
-              {/* Product Badge & Category */}
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 bg-aws-orange/10 border border-aws-orange/30 text-aws-orange font-mono text-[10px] uppercase tracking-widest font-black rounded">
-                    OFFICIAL DROP
-                  </span>
-                  <span className="font-mono text-[10px] uppercase text-white/40 tracking-wider">
-                    COMBO BUNDLE // 01
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5 text-emerald-400 font-mono text-[10px] uppercase font-bold tracking-widest">
-                  <PackageCheck size={14} /> Dispatch Ready
-                </div>
-              </div>
+        {/* 3 Products Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8 items-stretch">
+          {merchProducts.map((product, idx) => {
+            const Icon =
+              product.id === 'bag'
+                ? ShoppingBag
+                : product.id === 'welcome-kit'
+                ? Gift
+                : Zap;
 
-              {/* Title & Description */}
-              <h3 className="font-sans font-black italic text-2xl sm:text-3xl lg:text-4xl uppercase tracking-tight text-white mb-3">
-                Bags & Welcome Kit Combo
-              </h3>
-              <p className="font-sans text-xs sm:text-sm text-white/70 leading-relaxed max-w-2xl mb-6">
-                The ultimate commemorative package from AWS Student Community Day Dhule 2026. Includes the official heavy-duty SCD paddock bag, metal badge & lanyard, technical developer notebook, holographic sticker pack, and collector items.
-              </p>
-
-              {/* Quick Specs / Highlights Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-                <div className="bg-white/[0.02] border border-white/5 p-3 rounded-lg flex flex-col">
-                  <span className="font-mono text-[8.5px] uppercase text-white/40 tracking-widest flex items-center gap-1 mb-1">
-                    <Truck size={11} className="text-aws-orange" /> Delivery
+            return (
+              <motion.div
+                key={product.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.12 }}
+                className={`rounded-2xl flex flex-col justify-between overflow-hidden border transition-all duration-300 group ${
+                  product.isPopular
+                    ? 'bg-[#0f0f0f] border-aws-orange/80 shadow-[0_0_35px_rgba(255,153,0,0.18)] hover:shadow-[0_0_45px_rgba(255,153,0,0.3)] ring-1 ring-aws-orange/40'
+                    : 'bg-[#0a0a0a] border-white/10 hover:border-white/25 hover:bg-[#0e0e0e] shadow-xl'
+                }`}
+              >
+                {/* Top Badge bar */}
+                <div className="p-5 pb-0 flex items-center justify-between">
+                  <span
+                    className={`px-2.5 py-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest font-black rounded ${
+                      product.isPopular
+                        ? 'bg-aws-orange text-black font-extrabold shadow-[0_0_10px_rgba(255,153,0,0.4)]'
+                        : 'bg-white/10 text-white/90 border border-white/10'
+                    }`}
+                  >
+                    {product.badge}
                   </span>
-                  <span className="font-sans text-xs font-bold text-white">Direct / In-Person</span>
+                  <div className="flex items-center gap-1 text-emerald-400 font-mono text-[10px] font-bold">
+                    <Star size={12} fill="currentColor" />
+                    <span>{product.rating}</span>
+                  </div>
                 </div>
-                <div className="bg-white/[0.02] border border-white/5 p-3 rounded-lg flex flex-col">
-                  <span className="font-mono text-[8.5px] uppercase text-white/40 tracking-widest flex items-center gap-1 mb-1">
-                    <ShieldCheck size={11} className="text-emerald-400" /> Authenticity
-                  </span>
-                  <span className="font-sans text-xs font-bold text-white">100% Official Swag</span>
-                </div>
-                <div className="bg-white/[0.02] border border-white/5 p-3 rounded-lg flex flex-col col-span-2 sm:col-span-1">
-                  <span className="font-mono text-[8.5px] uppercase text-white/40 tracking-widest flex items-center gap-1 mb-1">
-                    <Flame size={11} className="text-f1-red" /> Edition
-                  </span>
-                  <span className="font-sans text-xs font-bold text-white">Dhule 2026 Season</span>
-                </div>
-              </div>
 
-              {/* Inclusions Selector Tabs */}
-              <div className="mb-6">
-                <p className="font-mono text-[10px] uppercase tracking-widest text-aws-orange font-bold mb-3 flex items-center gap-1.5">
-                  <Layers size={13} /> Everything Included In The Combo:
-                </p>
-                <div className="flex flex-wrap gap-2">
-                  {comboItems.map((item) => {
-                    const isSelected = selectedItem === item.id;
-                    const Icon = item.icon;
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        onClick={() => setSelectedItem(item.id)}
-                        className={`flex items-center gap-2 px-3 py-2 rounded-lg font-mono text-[11px] uppercase tracking-wider transition-all cursor-pointer border ${
-                          isSelected
-                            ? 'bg-aws-orange/15 border-aws-orange text-white shadow-[0_0_15px_rgba(255,153,0,0.15)] font-bold'
-                            : 'bg-white/[0.02] border-white/10 text-white/60 hover:text-white hover:border-white/25'
-                        }`}
-                      >
-                        <Icon size={14} className={isSelected ? 'text-aws-orange' : 'text-white/40'} />
-                        <span>{item.title}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
+                {/* Clickable Image Container */}
+                <Link
+                  to={`/product/${product.id}`}
+                  className="p-5 block overflow-hidden"
+                  aria-label={`View ${product.title}`}
+                >
+                  <ProductCardImage
+                    images={product.images}
+                    title={product.title}
+                    icon={Icon}
+                  />
+                </Link>
 
-              {/* Selected Item Detail Callout */}
-              {(() => {
-                const active = comboItems.find((c) => c.id === selectedItem) || comboItems[0];
-                return (
-                  <div className="p-4 bg-white/[0.03] border border-white/10 rounded-xl relative overflow-hidden text-left mb-6">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="font-sans font-black italic text-sm text-aws-orange uppercase tracking-wide">
-                        {active.title}
+                {/* Content Section */}
+                <div className="px-5 pb-5 flex-1 flex flex-col justify-between text-left">
+                  <div>
+                    <div className="flex items-baseline gap-2 mb-1">
+                      <span className="font-sans font-black italic text-2xl sm:text-3xl text-aws-orange">
+                        ₹{product.price}
                       </span>
-                      <span className="font-mono text-[9px] uppercase tracking-widest bg-white/10 text-white/80 px-2 py-0.5 rounded">
-                        {active.tag}
+                      <span className="font-mono text-[10px] text-white/40 uppercase">INR</span>
+                      <span className="font-mono text-xs text-white/40 line-through">
+                        ₹{product.mrp}
                       </span>
+                      {product.savings && (
+                        <span className="font-mono text-[9px] text-emerald-400 font-bold uppercase">
+                          Save ₹{product.savings}
+                        </span>
+                      )}
                     </div>
-                    <p className="font-sans text-xs text-white/70 leading-relaxed">
-                      {active.description}
+
+                    <Link to={`/product/${product.id}`} className="block group-hover:text-aws-orange transition-colors">
+                      <h3 className="font-sans font-black italic text-lg sm:text-xl uppercase tracking-tight text-white mb-1.5">
+                        {product.shortTitle}
+                      </h3>
+                    </Link>
+
+                    <p className="font-sans text-xs text-white/60 line-clamp-2 leading-relaxed mb-4">
+                      {product.tagline}
                     </p>
+
+                    {/* Bullet Highlights */}
+                    <div className="space-y-1.5 mb-5 border-t border-white/5 pt-3">
+                      {product.highlights.slice(0, 2).map((h) => (
+                        <div key={h} className="flex items-start gap-2 text-[11px] font-sans text-white/70">
+                          <CheckCircle2 size={12} className="text-aws-orange shrink-0 mt-0.5" />
+                          <span className="line-clamp-1">{h}</span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                );
-              })()}
-            </div>
 
-            {/* Bottom In-Section Action Row */}
-            <div className="pt-4 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex flex-col text-left">
-                <span className="font-mono text-[9px] uppercase tracking-widest text-white/40">Combo Status</span>
-                <span className="font-sans font-black italic text-base sm:text-lg uppercase text-white">
-                  Limited Units Available
-                </span>
-              </div>
-              
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="w-full sm:w-auto px-6 py-3.5 bg-aws-orange text-black font-sans font-black italic uppercase text-xs tracking-widest skew-x-[-10deg] hover:bg-white transition-all shadow-[0_0_20px_rgba(255,153,0,0.25)] flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <span className="skew-x-[10deg] flex items-center gap-2">
-                  Order Combo on WhatsApp <ExternalLink size={14} />
-                </span>
-              </a>
-            </div>
-          </motion.div>
+                  {/* Buy / View Details CTA Button */}
+                  <Link
+                    to={`/product/${product.id}`}
+                    className={`w-full py-3.5 px-4 rounded-xl font-sans font-black italic uppercase text-xs tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                      product.isPopular
+                        ? 'bg-aws-orange text-black hover:bg-white shadow-[0_0_20px_rgba(255,153,0,0.3)]'
+                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/15'
+                    }`}
+                  >
+                    <span>View &amp; Buy (₹{product.price})</span>
+                    <ArrowRight size={14} />
+                  </Link>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
 
-          {/* Right Column: Order & Direct Contacts Console */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.15, duration: 0.6 }}
-            className="lg:col-span-5 bg-[#0e0e0e] border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col justify-between relative shadow-2xl"
-          >
-            {/* Top HUD decoration */}
-            <div className="flex justify-between items-center border-b border-white/5 pb-4 mb-6 font-mono text-[9px] text-white/40 uppercase tracking-widest">
-              <span>ORDER DESK // DIRECT INQUIRY</span>
-              <span className="text-aws-orange font-bold">READY TO ASSIST</span>
+        {/* Bottom Delivery Info Bar */}
+        <div className="p-4 sm:p-5 bg-[#0a0a0a] border border-white/10 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-left">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-aws-orange/10 border border-aws-orange/30 flex items-center justify-center text-aws-orange shrink-0">
+              <Truck size={20} />
             </div>
-
-            <div className="flex flex-col gap-5">
-              <h4 className="font-sans font-black italic text-xl uppercase tracking-tight text-white text-left">
-                How to Order Your Combo
-              </h4>
-              
-              <p className="font-sans text-xs text-white/60 leading-relaxed text-left">
-                To collect or get your <span className="text-white font-bold">Bags & Welcome Kit Combo</span> dispatched, contact our organizing team directly via WhatsApp or phone. We will confirm your kit reservation instantly.
+            <div>
+              <p className="font-sans font-bold text-xs sm:text-sm text-white">
+                FREE Campus Pickup at SVKM IOT / STME Campus • Hand Delivery &amp; Pan India Courier
               </p>
-
-              {/* Steps / Checklist */}
-              <div className="space-y-2.5 text-left font-sans text-xs text-white/80">
-                <div className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-aws-orange shrink-0 mt-0.5" />
-                  <span>Choose your quantity of the Bags & Welcome Kit combo.</span>
-                </div>
-                <div className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-aws-orange shrink-0 mt-0.5" />
-                  <span>Drop a message on WhatsApp or call any organizer below.</span>
-                </div>
-                <div className="flex items-start gap-2.5">
-                  <CheckCircle2 size={16} className="text-aws-orange shrink-0 mt-0.5" />
-                  <span>Confirm delivery or in-person campus pickup at Dhule.</span>
-                </div>
-              </div>
-
-              {/* Direct Organizer Contact Cards */}
-              <div className="p-4 bg-black/60 border border-white/10 rounded-xl mt-2 font-mono text-xs text-left space-y-3">
-                <span className="text-[10px] uppercase font-bold text-aws-orange tracking-widest block">
-                  Organizers Direct Lines:
-                </span>
-                
-                <div className="space-y-2 text-white/80">
-                  <div className="flex items-center justify-between pb-2 border-b border-white/5">
-                    <div>
-                      <p className="font-bold text-white text-[11px]">Soham Chaudhari</p>
-                      <p className="text-[9px] text-white/40 uppercase">Organizer</p>
-                    </div>
-                    <a
-                      href="tel:+919834382337"
-                      className="text-aws-orange hover:underline font-bold flex items-center gap-1 text-[11px]"
-                    >
-                      <Phone size={11} /> +91 98343 82337
-                    </a>
-                  </div>
-
-                  <div className="flex items-center justify-between pb-2 border-b border-white/5">
-                    <div>
-                      <p className="font-bold text-white text-[11px]">Vaibhav Chaudhari</p>
-                      <p className="text-[9px] text-white/40 uppercase">Organizer</p>
-                    </div>
-                    <a
-                      href="tel:+918007298092"
-                      className="text-aws-orange hover:underline font-bold flex items-center gap-1 text-[11px]"
-                    >
-                      <Phone size={11} /> +91 80072 98092
-                    </a>
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="font-bold text-white text-[11px]">Saurabh Rajput</p>
-                      <p className="text-[9px] text-white/40 uppercase">Organizer</p>
-                    </div>
-                    <a
-                      href="tel:+919890991510"
-                      className="text-aws-orange hover:underline font-bold flex items-center gap-1 text-[11px]"
-                    >
-                      <Phone size={11} /> +91 98909 91510
-                    </a>
-                  </div>
-                </div>
-              </div>
+              <p className="font-mono text-[10px] text-white/50">
+                Collect for FREE at SVKM IOT Dhule / STME Campus, or get hand delivery in Dhule (Soham) &amp; Amalner (Vaibhav), or Pan India Courier (₹99).
+              </p>
             </div>
+          </div>
 
-            {/* Email Support Copy */}
-            <div className="mt-6 pt-4 border-t border-white/5 flex flex-col gap-3">
-              <button
-                type="button"
-                onClick={handleCopyEmail}
-                className="w-full py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-colors font-mono text-[10px] text-white uppercase tracking-widest rounded flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Mail size={12} className="text-aws-orange" />
-                {copiedEmail ? 'Email Copied to Clipboard!' : 'info@aws-scd-dhule.tech'}
-              </button>
-            </div>
-          </motion.div>
-
+          <Link
+            to="/merchstore"
+            className="px-5 py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-mono text-xs uppercase tracking-wider rounded-lg transition-colors shrink-0"
+          >
+            Explore Merch Store →
+          </Link>
         </div>
       </div>
     </section>

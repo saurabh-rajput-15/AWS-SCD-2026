@@ -105,9 +105,9 @@ export function TicketsPurchasePage() {
         </div>
 
         <div className="flex flex-wrap gap-4 justify-center">
-          <a href="/#store" className="px-6 py-3 bg-aws-orange text-black font-sans font-black italic uppercase text-xs tracking-widest skew-x-[-6deg] hover:bg-white transition-all shadow-[0_0_15px_rgba(255,153,0,0.3)]">
-            <span className="skew-x-[6deg] block">Get Merch Combo</span>
-          </a>
+          <Link to="/merchstore" className="px-6 py-3 bg-aws-orange text-black font-sans font-black italic uppercase text-xs tracking-widest skew-x-[-6deg] hover:bg-white transition-all shadow-[0_0_15px_rgba(255,153,0,0.3)]">
+            <span className="skew-x-[6deg] block">Get Merch</span>
+          </Link>
           <Link to="/" className="px-6 py-3 bg-white/10 hover:bg-white/20 transition-colors font-mono text-xs uppercase tracking-widest border border-white/20 text-white hover:text-white">
             Return to Home
           </Link>

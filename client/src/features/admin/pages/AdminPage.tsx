@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { BarChart3, Ticket, Users, Download, LogOut, ArrowLeft, Mail, Menu, X } from 'lucide-react';
+import { BarChart3, Ticket, Users, Download, LogOut, ArrowLeft, Mail, Menu, X, ShoppingBag } from 'lucide-react';
 import { useAdminAuth } from '../hooks/useAdminAuth';
 import { AdminLogin } from '../components/AdminLogin';
 import { TelemetryCards } from '../components/TelemetryCards';
 import { PassTypesManager } from '../components/PassTypesManager';
 import { RegistrationsTable } from '../components/RegistrationsTable';
+import { MerchOrdersTable } from '../components/MerchOrdersTable';
 import { ExportCSVButton } from '../components/ExportCSVButton';
 import { EmailShoutout } from '../components/EmailShoutout';
 import { SpeakersTable } from '../components/SpeakersTable';
@@ -20,7 +21,7 @@ import { OfflinePassGenerator } from '../components/OfflinePassGenerator';
 import { FeedbackTable } from '../components/FeedbackTable';
 import { Mic, Handshake, Building2, Settings, Tag, UserCheck, Gift, UserPlus, Star } from 'lucide-react';
 
-type Tab = 'overview' | 'passes' | 'generate-pass' | 'promo' | 'referrals' | 'registrations' | 'feedback' | 'speakers' | 'partners' | 'sponsors' | 'volunteers' | 'mpd' | 'shoutout' | 'export' | 'settings';
+type Tab = 'overview' | 'passes' | 'generate-pass' | 'promo' | 'referrals' | 'registrations' | 'merch' | 'feedback' | 'speakers' | 'partners' | 'sponsors' | 'volunteers' | 'mpd' | 'shoutout' | 'export' | 'settings';
 
 const navItems: Array<{ key: Tab; label: string; icon: any }> = [
   { key: 'overview', label: 'Overview', icon: BarChart3 },
@@ -29,6 +30,7 @@ const navItems: Array<{ key: Tab; label: string; icon: any }> = [
   { key: 'promo', label: 'Promo Codes', icon: Tag },
   { key: 'referrals', label: 'Referrals', icon: Gift },
   { key: 'registrations', label: 'Registrations', icon: Users },
+  { key: 'merch', label: 'Merch Orders', icon: ShoppingBag },
   { key: 'feedback', label: 'Event Feedback', icon: Star },
   { key: 'speakers', label: 'CFP Speakers', icon: Mic },
   { key: 'partners', label: 'Partners', icon: Handshake },
@@ -44,6 +46,39 @@ export function AdminPage() {
   const { authed, login, logout } = useAdminAuth();
   const [activeTab, setActiveTab] = useState<Tab>('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Dynamic visible tabs loaded from localStorage / user settings
+  const [visibleTabs, setVisibleTabs] = useState<string[]>(() => {
+    try {
+      const saved = localStorage.getItem('scd_admin_sidebar_views');
+      return saved ? JSON.parse(saved) : navItems.map((i) => i.key);
+    } catch {
+      return navItems.map((i) => i.key);
+    }
+  });
+
+  // Listen for sidebar configuration changes made in Settings
+  useEffect(() => {
+    const handleConfigChange = () => {
+      try {
+        const saved = localStorage.getItem('scd_admin_sidebar_views');
+        if (saved) {
+          setVisibleTabs(JSON.parse(saved));
+        }
+      } catch (err) {
+        console.error('Error updating sidebar views:', err);
+      }
+    };
+
+    window.addEventListener('scd_admin_sidebar_changed', handleConfigChange);
+    return () => {
+      window.removeEventListener('scd_admin_sidebar_changed', handleConfigChange);
+    };
+  }, []);
+
+  const filteredNavItems = navItems.filter(
+    (item) => item.key === 'settings' || visibleTabs.includes(item.key)
+  );
 
   if (!authed) {
     return <AdminLogin onLogin={login} />;
@@ -107,7 +142,7 @@ export function AdminPage() {
 
         {/* Nav */}
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
-          {navItems.map((item) => (
+          {filteredNavItems.map((item) => (
             <button type="button"
               key={item.key}
               onClick={() => {
@@ -158,6 +193,7 @@ export function AdminPage() {
         {activeTab === 'promo' && <PromoCodesManager />}
         {activeTab === 'referrals' && <ReferralLeaderboard />}
         {activeTab === 'registrations' && <RegistrationsTable />}
+        {activeTab === 'merch' && <MerchOrdersTable />}
         {activeTab === 'feedback' && <FeedbackTable />}
         {activeTab === 'speakers' && <SpeakersTable />}
         {activeTab === 'partners' && <PartnersTable />}

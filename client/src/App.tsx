@@ -36,6 +36,10 @@ const StatusPage = lazy(() => import('./components/StatusPage').then(module => (
 const BadgePage = lazy(() => import('./components/BadgePage').then(module => ({ default: module.BadgePage })));
 const CertificatePage = lazy(() => import('./components/CertificatePage').then(module => ({ default: module.CertificatePage })));
 const CodeOfConductPage = lazy(() => import('./components/CodeOfConductPage').then(module => ({ default: module.CodeOfConductPage })));
+const MerchStorePage = lazy(() => import('./components/MerchStorePage').then(module => ({ default: module.MerchStorePage })));
+const ProductDetailPage = lazy(() => import('./components/ProductDetailPage').then(module => ({ default: module.ProductDetailPage })));
+const CheckoutPage = lazy(() => import('./components/CheckoutPage').then(module => ({ default: module.CheckoutPage })));
+const MerchOrderPage = lazy(() => import('./components/MerchOrderPage').then(module => ({ default: module.MerchOrderPage })));
 import { BackToTop } from './components/BackToTop';
 import { CustomCursor } from './components/CustomCursor';
 import { SmoothScroll } from './components/SmoothScroll';
@@ -135,6 +139,16 @@ export default function App() {
         <Route path="/cert" element={<CertificatePage />} />
         <Route path="/feedback" element={<FeedbackPage />} />
         <Route path="/codeofconduct" element={<CodeOfConductPage />} />
+        <Route path="/merchstore" element={<MerchStorePage />} />
+        <Route path="/merch-store" element={<MerchStorePage />} />
+        <Route path="/merch" element={<MerchStorePage />} />
+        <Route path="/product" element={<MerchStorePage />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
+        <Route path="/products/:id" element={<ProductDetailPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/checkout/:productId" element={<CheckoutPage />} />
+        <Route path="/order/:orderRef" element={<MerchOrderPage />} />
+        <Route path="/merch/order/:orderRef" element={<MerchOrderPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </Suspense>
