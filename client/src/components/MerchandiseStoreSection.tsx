@@ -155,10 +155,10 @@ export const MerchandiseStoreSection = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: idx * 0.12 }}
-                className={`rounded-2xl flex flex-col justify-between overflow-hidden border transition-all duration-300 group ${
+                className={`rounded-2xl flex flex-col justify-between overflow-hidden border transition-all duration-300 group bg-[#0c0c0c] hover:bg-[#0e0e0e] shadow-xl ${
                   product.isPopular
-                    ? 'bg-[#0f0f0f] border-aws-orange/80 shadow-[0_0_35px_rgba(255,153,0,0.18)] hover:shadow-[0_0_45px_rgba(255,153,0,0.3)] ring-1 ring-aws-orange/40'
-                    : 'bg-[#0a0a0a] border-white/10 hover:border-white/25 hover:bg-[#0e0e0e] shadow-xl'
+                    ? 'border-aws-orange/60 shadow-[0_0_30px_rgba(255,153,0,0.15)] hover:border-aws-orange hover:shadow-[0_0_40px_rgba(255,153,0,0.25)]'
+                    : 'border-white/10 hover:border-aws-orange/60 hover:shadow-[0_0_30px_rgba(255,153,0,0.15)]'
                 }`}
               >
                 {/* Top Badge bar */}
@@ -167,7 +167,7 @@ export const MerchandiseStoreSection = () => {
                     className={`px-2.5 py-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest font-black rounded ${
                       product.isPopular
                         ? 'bg-aws-orange text-black font-extrabold shadow-[0_0_10px_rgba(255,153,0,0.4)]'
-                        : 'bg-white/10 text-white/90 border border-white/10'
+                        : 'bg-aws-orange/15 text-aws-orange border border-aws-orange/30 font-bold'
                     }`}
                   >
                     {product.badge}
@@ -230,14 +230,10 @@ export const MerchandiseStoreSection = () => {
                     </div>
                   </div>
 
-                  {/* Buy / View Details CTA Button */}
+                  {/* Buy / View Details CTA Button — Uniform style across all 3 products */}
                   <Link
                     to={`/product/${product.id}`}
-                    className={`w-full py-3.5 px-4 rounded-xl font-sans font-black italic uppercase text-xs tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
-                      product.isPopular
-                        ? 'bg-aws-orange text-black hover:bg-white shadow-[0_0_20px_rgba(255,153,0,0.3)]'
-                        : 'bg-white/10 hover:bg-white/20 text-white border border-white/15'
-                    }`}
+                    className="w-full py-3.5 px-4 rounded-xl font-sans font-black italic uppercase text-xs tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer bg-aws-orange text-black hover:bg-white shadow-[0_0_20px_rgba(255,153,0,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)]"
                   >
                     <span>View &amp; Buy (₹{product.price})</span>
                     <ArrowRight size={14} />
