@@ -417,3 +417,19 @@ textarea:focus-visible,
 .animate-fadeIn {
   animation: fadeIn 0.35s ease-out both;
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CHECKOUT TOAST — Centered tactile pop-in animation
+   ═══════════════════════════════════════════════════════════════════ */
+@keyframes popIn {
+  0% { opacity: 0; transform: scale(0.92) translateY(10px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes slideDown {
+  0% { opacity: 0; transform: translate(-50%, -24px) scale(0.95); }
+  60% { opacity: 1; transform: translate(-50%, 4px) scale(1.02); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+

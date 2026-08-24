@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   useSearchParams,
   useParams,
@@ -14,6 +14,7 @@ import {
   MerchProduct,
 } from "../data/merchProducts";
 import { api } from "../lib/api";
+import { triggerHaptic } from "../lib/haptics";
 import { loadRazorpayScript, getRazorpayKeyId } from "../lib/razorpay";
 import type {
   RazorpayOptions,
@@ -97,6 +98,22 @@ export const CheckoutPage = () => {
     pincode: savedDraft?.formData?.pincode || "",
   });
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+
+  // Toast notification state
+  const [toast, setToast] = useState<{ message: string; fields: string[] } | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = useCallback((message: string, fields: string[]) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast({ message, fields });
+    triggerHaptic("error");
+    toastTimerRef.current = setTimeout(() => setToast(null), 5000);
+  }, []);
+
+  const dismissToast = useCallback(() => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToast(null);
+  }, []);
 
   // Promo Code State
   const [promoInput, setPromoInput] = useState<string>("");
@@ -257,12 +274,14 @@ export const CheckoutPage = () => {
       setPromoSuccessMsg(res.data.message || `Promo code "${code}" applied!`);
       setPromoInput("");
       triggerConfetti();
+      triggerHaptic("success");
 
     } catch (err: any) {
       setAppliedPromo(null);
       const msg =
         err.response?.data?.message || "Invalid or expired promo code";
       setPromoError(msg);
+      triggerHaptic("warning");
     } finally {
       setPromoLoading(false);
     }
@@ -386,6 +405,7 @@ export const CheckoutPage = () => {
       });
       setIsEmailVerified(true);
       setOtpSuccessMessage("Email verified successfully! ✓");
+      triggerHaptic("success");
       setFormErrors((prev) => {
         const copy = { ...prev };
         delete copy.email;
@@ -398,6 +418,7 @@ export const CheckoutPage = () => {
         err.response?.data?.error ||
         "Incorrect or expired verification code.";
       setOtpError(msg);
+      triggerHaptic("error");
     } finally {
       setOtpVerifying(false);
     }
@@ -430,10 +451,81 @@ export const CheckoutPage = () => {
     return Object.keys(errors).length === 0;
   };
 
+  const scrollToFirstError = (errors: Record<string, string>) => {
+    // Map form field keys to their input element IDs
+    const fieldIdMap: Record<string, string> = {
+      fullName: "checkout-fullName",
+      email: "checkout-email",
+      phone: "checkout-phone",
+      streetAddress: "checkout-streetAddress",
+      city: "checkout-city",
+      state: "checkout-state",
+      pincode: "checkout-pincode",
+    };
+
+    const firstKey = Object.keys(errors)[0];
+    if (!firstKey) return;
+
+    const targetId = fieldIdMap[firstKey];
+    if (!targetId) return;
+
+    const el = document.getElementById(targetId);
+    if (el) {
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      // Only focus on desktop/non-touch devices to avoid popping up virtual keyboard on mobile
+      const isTouchOrMobile =
+        typeof window !== "undefined" &&
+        (window.matchMedia("(pointer: coarse)").matches ||
+          "ontouchstart" in window ||
+          navigator.maxTouchPoints > 0 ||
+          window.innerWidth < 768);
+
+      if (!isTouchOrMobile) {
+        setTimeout(() => el.focus({ preventScroll: true }), 400);
+      }
+    }
+  };
+
   const handlePlaceOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (submittingOrder || paymentVerifying) return;
-    if (!validateForm()) return;
+
+    if (!validateForm()) {
+      // Build a human-readable list of missing fields
+      const errors: Record<string, string> = {};
+      if (!formData.fullName.trim()) errors.fullName = "Full name is required";
+      if (!formData.email.trim() || !formData.email.includes("@")) {
+        errors.email = "Valid email is required";
+      } else if (!isEmailVerified) {
+        errors.email = "Please verify your email address using OTP";
+      }
+      if (!formData.phone.trim() || formData.phone.replace(/\D/g, "").length < 10)
+        errors.phone = "Valid 10-digit WhatsApp number is required";
+      if (!formData.streetAddress.trim())
+        errors.streetAddress = "Address is required";
+      if (!formData.city.trim()) errors.city = "City is required";
+      if (!formData.state.trim()) errors.state = "State is required";
+      if (!formData.pincode.trim() || formData.pincode.replace(/\D/g, "").length < 6)
+        errors.pincode = "Valid 6-digit Pincode is required";
+
+      const fieldLabels: Record<string, string> = {
+        fullName: "Full Name",
+        email: "Email",
+        phone: "Phone Number",
+        streetAddress: "Address",
+        city: "City",
+        state: "State",
+        pincode: "Pincode",
+      };
+      const missingFields = Object.keys(errors).map((k) => fieldLabels[k] || k);
+      showToast(
+        `Please fill in all required fields before placing your order.`,
+        missingFields,
+      );
+      scrollToFirstError(errors);
+      return;
+    }
 
     setSubmittingOrder(true);
     setPaymentError("");
@@ -575,6 +667,63 @@ export const CheckoutPage = () => {
 
   return (
     <div className="min-h-screen bg-[#050505] text-[#e0e0e0] flex flex-col selection:bg-aws-orange selection:text-black">
+      {/* Centered Notification Toast */}
+      {toast && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.2s_ease-out]"
+          onClick={dismissToast}
+        >
+          <div
+            className="w-full max-w-md p-5 bg-[#120a04] border border-[#FF9900]/70 rounded-2xl shadow-[0_12px_48px_rgba(255,153,0,0.35)] animate-[popIn_0.25s_cubic-bezier(0.16,1,0.3,1)] relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start gap-3.5">
+              <div className="p-2.5 bg-[#FF9900]/15 rounded-xl border border-[#FF9900]/30 shrink-0">
+                <AlertCircle size={22} className="text-[#FF9900]" />
+              </div>
+              <div className="flex-1 min-w-0 pr-4">
+                <h4 className="font-sans font-bold text-sm text-white leading-snug">
+                  {toast.message}
+                </h4>
+                {toast.fields.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2.5">
+                    {toast.fields.map((f) => (
+                      <span
+                        key={f}
+                        className="px-2.5 py-1 bg-[#FF9900]/15 border border-[#FF9900]/30 rounded-lg font-mono text-[10px] text-[#FF9900] font-bold uppercase tracking-wider"
+                      >
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                )}
+                <p className="font-mono text-[10px] text-white/50 mt-2.5">
+                  Please complete the missing details to proceed with checkout.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={dismissToast}
+                className="absolute top-4 right-4 p-1.5 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+                aria-label="Dismiss notification"
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className="mt-4 pt-3 border-t border-white/10 flex justify-end">
+              <button
+                type="button"
+                onClick={dismissToast}
+                className="px-4 py-2 bg-[#FF9900] hover:bg-white text-black font-sans font-black italic uppercase text-xs tracking-wider rounded-lg transition-all cursor-pointer shadow-[0_0_15px_rgba(255,153,0,0.3)]"
+              >
+                Got It
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Background Ambience */}
       <div className="fixed inset-0 opacity-[0.03] pointer-events-none bg-[radial-gradient(#ffffff_1px,transparent_1px)] bg-[size:24px_24px]" />
       <div className="fixed -top-20 left-1/4 w-[500px] h-[500px] bg-aws-orange/5 blur-[180px] rounded-full pointer-events-none" />
@@ -818,6 +967,7 @@ export const CheckoutPage = () => {
                     Full Name *
                   </label>
                   <input
+                    id="checkout-fullName"
                     type="text"
                     placeholder="e.g. Rahul Sharma"
                     value={formData.fullName}
@@ -869,6 +1019,7 @@ export const CheckoutPage = () => {
 
                   <div className="flex flex-col sm:flex-row gap-2">
                     <input
+                      id="checkout-email"
                       type="email"
                       placeholder="e.g. rahul@example.com"
                       value={formData.email}
@@ -983,6 +1134,7 @@ export const CheckoutPage = () => {
                     Phone Number (WhatsApp Active) *
                   </label>
                   <input
+                    id="checkout-phone"
                     type="tel"
                     placeholder="e.g. 9876543210"
                     value={formData.phone}
@@ -1008,6 +1160,7 @@ export const CheckoutPage = () => {
                       : "Delivery Address / House No / Flat / Street *"}
                   </label>
                   <input
+                    id="checkout-streetAddress"
                     type="text"
                     placeholder={
                       selectedDeliveryId === "campus-pickup"
@@ -1041,6 +1194,7 @@ export const CheckoutPage = () => {
                       City *
                     </label>
                     <input
+                      id="checkout-city"
                       type="text"
                       placeholder="e.g. Dhule"
                       value={formData.city}
@@ -1063,6 +1217,7 @@ export const CheckoutPage = () => {
                       State *
                     </label>
                     <input
+                      id="checkout-state"
                       type="text"
                       placeholder="e.g. Maharashtra"
                       value={formData.state}
@@ -1085,6 +1240,7 @@ export const CheckoutPage = () => {
                       Pincode *
                     </label>
                     <input
+                      id="checkout-pincode"
                       type="text"
                       placeholder="e.g. 424001"
                       value={formData.pincode}
