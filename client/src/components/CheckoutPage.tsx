@@ -486,7 +486,7 @@ export const CheckoutPage = () => {
         currency: orderData.currency || "INR",
         name: "AWS SCD Dhule 2026",
         description: `Official Merchandise: ${selectedProduct.title} (Qty: ${quantity})`,
-        image: "https://aws-scd-dhule.tech/scd-dhule-logo.png",
+        image: "https://aws-scd-dhule.tech/scdpreview.png",
         order_id: razorpayOrderId,
         prefill: {
           name: formData.fullName.trim(),
