@@ -1,0 +1,5 @@
+CNAME mt89.aws-scd-dhule.tech -> smtp.mailtrap.live
+CNAME rwmt1._domainkey.aws-scd-dhule.tech -> rwmt1.dkim.smtp.mailtrap.live
+CNAME rwmt2._domainkey.aws-scd-dhule.tech -> rwmt2.dkim.smtp.mailtrap.live
+TXT _dmarc.aws-scd-dhule.tech -> v=DMARC1; p=none; rua=mailto:dmarc@smtp-staging.mailtrap.net; ruf=mailto:dmarc@smtp-staging.mailtrap.net; rf=afrf; pct=100
+CNAME mt-link.aws-scd-dhule.tech -> t.mailtrap.live

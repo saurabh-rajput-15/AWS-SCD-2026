@@ -24,11 +24,13 @@ import { FooterSection } from './FooterSection';
 const ProductCardImage = ({
   images,
   title,
-  icon: Icon
+  icon: Icon,
+  isSoldOut
 }: {
   images: string[];
   title: string;
   icon: any;
+  isSoldOut?: boolean;
 }) => {
   const [activeIdx, setActiveIdx] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -110,6 +112,14 @@ const ProductCardImage = ({
         </div>
       )}
 
+      {isSoldOut && (
+        <div className="absolute top-2.5 right-2.5 z-20">
+          <span className="px-2.5 py-1 bg-red-600/90 text-white font-mono text-[9px] font-black uppercase tracking-wider rounded shadow-md border border-red-400/40 flex items-center gap-1">
+            Sold Out
+          </span>
+        </div>
+      )}
+
       <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 bg-black/70 backdrop-blur-md rounded text-white/70 font-mono text-[9px] z-10">
         <Icon size={11} className="text-aws-orange" />
         <span>{activeIdx + 1}/{images.length} Photos</span>
@@ -158,9 +168,9 @@ export const MerchStorePage = () => {
             AWS SCD Dhule 2026
           </span>
           <span className="h-4 w-px bg-white/10 hidden sm:inline-block" />
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-aws-orange/10 border border-aws-orange/30 rounded-full font-mono text-[10px] text-aws-orange uppercase tracking-wider font-bold">
-            <span className="w-1.5 h-1.5 rounded-full bg-aws-orange animate-ping" />
-            <span>Merch Store Drop</span>
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-red-500/10 border border-red-500/30 rounded-full font-mono text-[10px] text-red-400 uppercase tracking-wider font-bold">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+            <span>Drop Sold Out</span>
           </div>
         </div>
       </header>
@@ -184,9 +194,24 @@ export const MerchStorePage = () => {
           </div>
 
           <div className="flex items-center gap-3 self-center sm:self-auto">
-            <span className="px-3 py-1.5 bg-white/5 border border-white/10 rounded-lg font-mono text-xs text-white/70">
-              3 Official Drops Available
+            <span className="px-3 py-1.5 bg-red-500/15 border border-red-500/30 rounded-lg font-mono text-xs text-red-400 font-bold uppercase tracking-wider">
+              All Drops Sold Out
             </span>
+          </div>
+        </div>
+
+        {/* Sold Out Announcement Banner */}
+        <div className="p-4 sm:p-5 bg-red-500/10 border border-red-500/30 rounded-2xl flex items-start sm:items-center gap-3.5 text-left">
+          <div className="w-10 h-10 rounded-xl bg-red-500/20 border border-red-500/40 flex items-center justify-center text-red-400 shrink-0">
+            <AlertTriangle size={20} />
+          </div>
+          <div className="flex-1">
+            <p className="font-sans font-bold text-sm sm:text-base text-red-400 uppercase tracking-wide">
+              Official Merchandise Store — All Items Sold Out
+            </p>
+            <p className="font-sans text-xs text-white/70 leading-relaxed mt-0.5">
+              Thank you for the overwhelming response! Every collectible item in the official SCD Dhule 2026 drop is fully booked and sold out. Orders and checkouts are officially closed.
+            </p>
           </div>
         </div>
 
@@ -214,15 +239,20 @@ export const MerchStorePage = () => {
               >
                 {/* Top Badge bar */}
                 <div className="p-5 pb-0 flex items-center justify-between">
-                  <span
-                    className={`px-2.5 py-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest font-black rounded ${
-                      product.isPopular
-                        ? 'bg-aws-orange text-black font-extrabold shadow-[0_0_10px_rgba(255,153,0,0.4)]'
-                        : 'bg-aws-orange/15 text-aws-orange border border-aws-orange/30 font-bold'
-                    }`}
-                  >
-                    {product.badge}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-2.5 py-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest font-black rounded ${
+                        product.isPopular
+                          ? 'bg-aws-orange text-black font-extrabold shadow-[0_0_10px_rgba(255,153,0,0.4)]'
+                          : 'bg-aws-orange/15 text-aws-orange border border-aws-orange/30 font-bold'
+                      }`}
+                    >
+                      {product.badge}
+                    </span>
+                    <span className="px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded font-mono text-[9px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
+                      <AlertTriangle size={10} /> Sold Out
+                    </span>
+                  </div>
                   <div className="flex items-center gap-1 text-emerald-400 font-mono text-[10px] font-bold">
                     <Star size={12} fill="currentColor" />
                     <span>{product.rating}</span>
@@ -239,6 +269,7 @@ export const MerchStorePage = () => {
                     images={product.images}
                     title={product.title}
                     icon={Icon}
+                    isSoldOut={product.isSoldOut}
                   />
                 </Link>
 
@@ -260,20 +291,12 @@ export const MerchStorePage = () => {
                       )}
                     </div>
 
-                    {/* Live Stock Status from DB (No specific quantity shown to users) */}
-                    {inventoryStock && inventoryStock[product.id] && (
-                      <div className="mb-2">
-                        {inventoryStock[product.id].remaining <= 0 ? (
-                          <span className="px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded font-mono text-[9px] font-bold uppercase inline-flex items-center gap-1">
-                            <AlertTriangle size={10} /> Sold Out
-                          </span>
-                        ) : (
-                          <span className="px-2 py-0.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded font-mono text-[9px] font-bold uppercase inline-flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> In Stock
-                          </span>
-                        )}
-                      </div>
-                    )}
+                    {/* Live Stock Status */}
+                    <div className="mb-2">
+                      <span className="px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded font-mono text-[9px] font-bold uppercase inline-flex items-center gap-1">
+                        <AlertTriangle size={10} /> Sold Out (Out of Stock)
+                      </span>
+                    </div>
 
                     <Link to={`/product/${product.id}`} className="block group-hover:text-aws-orange transition-colors">
                       <h2 className="font-sans font-black italic text-lg sm:text-xl uppercase tracking-tight text-white mb-1.5">
@@ -297,12 +320,13 @@ export const MerchStorePage = () => {
                     </div>
                   </div>
 
-                  {/* Buy / View Details CTA Button — Uniform style across all 3 products */}
+                  {/* Buy / View Details CTA Button */}
                   <Link
                     to={`/product/${product.id}`}
-                    className="w-full py-3.5 px-4 rounded-xl font-sans font-black italic uppercase text-xs tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer bg-aws-orange text-black hover:bg-white shadow-[0_0_20px_rgba(255,153,0,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)]"
+                    className="w-full py-3.5 px-4 rounded-xl font-sans font-black italic uppercase text-xs tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/15"
                   >
-                    <span>View Product &amp; Buy</span>
+                    <span className="text-red-400 font-black">Sold Out</span>
+                    <span>• View Details</span>
                     <ArrowRight size={14} />
                   </Link>
                 </div>

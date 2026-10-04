@@ -230,9 +230,10 @@ export const CheckoutPage = () => {
   const totalAmount = round2(discountedSubtotal + selectedDelivery.charge);
 
   const currentProductStock = inventoryStock?.[selectedProduct.id];
-  const isProductOutOfStock = currentProductStock
-    ? currentProductStock.remaining <= 0
-    : false;
+  const isProductOutOfStock = Boolean(
+    selectedProduct.isSoldOut ||
+    (currentProductStock ? currentProductStock.remaining <= 0 : false)
+  );
 
   const triggerConfetti = () => {
     try {
@@ -527,6 +528,11 @@ export const CheckoutPage = () => {
       return;
     }
 
+    if (isProductOutOfStock) {
+      setPaymentError("This merchandise is currently Sold Out. Orders are closed.");
+      return;
+    }
+
     setSubmittingOrder(true);
     setPaymentError("");
 
@@ -813,6 +819,19 @@ export const CheckoutPage = () => {
                 </Link>
               </div>
 
+              {/* Sold Out Notice */}
+              {isProductOutOfStock && (
+                <div className="p-4 bg-red-500/15 border border-red-500/40 rounded-xl text-red-400 font-mono text-xs flex items-center gap-3">
+                  <AlertCircle size={18} className="shrink-0" />
+                  <div>
+                    <strong className="block uppercase tracking-wider text-red-400">Item Currently Sold Out</strong>
+                    <span className="text-white/70">
+                      All units for this drop are officially exhausted. Orders and checkout payments are closed.
+                    </span>
+                  </div>
+                </div>
+              )}
+
               {/* Single Active Product Card */}
               <div className="p-4 bg-white/[0.02] border border-white/10 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex items-center gap-4">
@@ -853,7 +872,7 @@ export const CheckoutPage = () => {
                     <button
                       type="button"
                       onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                      disabled={quantity <= 1}
+                      disabled={isProductOutOfStock || quantity <= 1}
                       className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 text-white font-bold flex items-center justify-center transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed text-sm"
                       title="Decrease quantity"
                     >
@@ -865,7 +884,7 @@ export const CheckoutPage = () => {
                     <button
                       type="button"
                       onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-                      disabled={quantity >= 10}
+                      disabled={isProductOutOfStock || quantity >= 10}
                       className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 text-white font-bold flex items-center justify-center transition-colors cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed text-sm"
                       title="Increase quantity"
                     >

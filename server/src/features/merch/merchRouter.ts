@@ -228,9 +228,9 @@ export async function handleCreateMerchOrder(req: Request, res: Response, next: 
 
       // 1. Check live inventory stock from DB table merch_inventory (with fallback to app_settings)
       let inventoryConfig: Record<string, number> = {
-        'bag': 150,
-        'welcome-kit': 150,
-        'combo': 200
+        'bag': 0,
+        'welcome-kit': 0,
+        'combo': 0
       };
 
       try {
@@ -663,9 +663,9 @@ router.post('/validate-promo', async (req: Request, res: Response, next: NextFun
 router.get('/inventory', async (_req: Request, res: Response, next: NextFunction) => {
   try {
     let inventoryConfig: Record<string, number> = {
-      'bag': 150,
-      'welcome-kit': 150,
-      'combo': 200
+      'bag': 0,
+      'welcome-kit': 0,
+      'combo': 0
     };
 
     try {

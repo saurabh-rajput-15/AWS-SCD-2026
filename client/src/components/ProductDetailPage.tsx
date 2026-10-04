@@ -29,7 +29,8 @@ import {
   Tag,
   Zap,
   Info,
-  PackageCheck
+  PackageCheck,
+  AlertTriangle
 } from 'lucide-react';
 import { FooterSection } from './FooterSection';
 
@@ -188,9 +189,9 @@ export const ProductDetailPage = () => {
           </button>
           <Link
             to="/#store"
-            className="px-3.5 py-1.5 bg-aws-orange text-black font-sans font-black italic uppercase text-[10px] tracking-wider skew-x-[-8deg] hover:bg-white transition-all hidden sm:inline-block"
+            className="px-3.5 py-1.5 bg-red-500/10 border border-red-500/30 text-red-400 font-sans font-black italic uppercase text-[10px] tracking-wider skew-x-[-8deg] hover:bg-red-500 hover:text-white transition-all hidden sm:inline-block"
           >
-            <span className="skew-x-[8deg] block">View All 3 Items</span>
+            <span className="skew-x-[8deg] block">All 3 Items Sold Out</span>
           </Link>
         </div>
       </header>
@@ -227,8 +228,8 @@ export const ProductDetailPage = () => {
                 >
                   {product.badge}
                 </span>
-                <span className="px-2.5 py-1 bg-black/60 backdrop-blur-md border border-white/10 text-emerald-400 font-mono text-[9px] font-bold uppercase tracking-wider rounded flex items-center gap-1">
-                  <PackageCheck size={11} /> Ready to Dispatch
+                <span className="px-2.5 py-1 bg-red-600/90 text-white font-mono text-[9px] font-black uppercase tracking-wider rounded border border-red-400/40 shadow-lg flex items-center gap-1">
+                  <AlertTriangle size={11} /> Sold Out
                 </span>
               </div>
 
@@ -355,8 +356,8 @@ export const ProductDetailPage = () => {
 
             {/* Price Block (Amazon/Flipkart Style) */}
             <div className="p-5 bg-gradient-to-br from-[#121212] to-[#0a0a0a] border border-white/10 rounded-2xl relative overflow-hidden">
-              <div className="absolute top-0 right-0 px-3 py-1 bg-f1-red text-white font-mono text-[10px] uppercase font-bold tracking-wider rounded-bl-lg">
-                Special Event Deal
+              <div className="absolute top-0 right-0 px-3 py-1 bg-red-600 text-white font-mono text-[10px] uppercase font-black tracking-wider rounded-bl-lg flex items-center gap-1">
+                <AlertTriangle size={11} /> Sold Out
               </div>
 
               <div className="flex flex-wrap items-baseline gap-3 mb-1">
@@ -378,35 +379,48 @@ export const ProductDetailPage = () => {
                 </div>
               )}
 
+              {/* Prominent Sold Out Alert */}
+              <div className="mt-4 p-3.5 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 font-mono text-xs flex items-start gap-2.5">
+                <AlertTriangle size={16} className="shrink-0 mt-0.5 text-red-400" />
+                <div>
+                  <span className="font-bold uppercase tracking-wider block text-red-400">
+                    This Item Is Officially Sold Out
+                  </span>
+                  <span className="text-white/60 text-[11px] block mt-0.5 leading-relaxed font-sans">
+                    All inventory units for this batch have been completely claimed. New checkouts and reservations are closed.
+                  </span>
+                </div>
+              </div>
+
               <p className="font-mono text-[10px] text-white/40 mt-2 uppercase tracking-wide">
                 Inclusive of all taxes • Secure ordering directly via organizing team
               </p>
             </div>
 
             {/* Quantity Selector */}
-            <div className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/10 rounded-xl">
+            <div className="flex items-center justify-between p-4 bg-white/[0.02] border border-white/10 rounded-xl opacity-50 pointer-events-none select-none">
               <div>
                 <span className="font-mono text-xs font-bold text-white block uppercase tracking-wider">
                   Quantity
                 </span>
-                <span className="font-mono text-[10px] text-white/40">Select number of units</span>
+                <span className="font-mono text-[10px] text-red-400">Sold out — No units available</span>
               </div>
               <div className="flex items-center gap-3 bg-black/60 border border-white/15 rounded-lg p-1">
                 <button
                   type="button"
-                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                  className="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-white font-bold text-lg flex items-center justify-center transition-colors cursor-pointer"
+                  disabled
+                  className="w-8 h-8 rounded bg-white/5 text-white/40 font-bold text-lg flex items-center justify-center cursor-not-allowed"
                   aria-label="Decrease quantity"
                 >
                   -
                 </button>
-                <span className="font-mono text-sm font-bold text-white w-6 text-center">
-                  {quantity}
+                <span className="font-mono text-sm font-bold text-white/50 w-6 text-center">
+                  0
                 </span>
                 <button
                   type="button"
-                  onClick={() => setQuantity((q) => Math.min(10, q + 1))}
-                  className="w-8 h-8 rounded bg-white/5 hover:bg-white/10 text-white font-bold text-lg flex items-center justify-center transition-colors cursor-pointer"
+                  disabled
+                  className="w-8 h-8 rounded bg-white/5 text-white/40 font-bold text-lg flex items-center justify-center cursor-not-allowed"
                   aria-label="Increase quantity"
                 >
                   +
@@ -474,14 +488,16 @@ export const ProductDetailPage = () => {
 
             {/* CTAs / Primary Checkout Buttons */}
             <div className="pt-2">
-              <Link
-                to={`/checkout/${product.id}?qty=${quantity}&delivery=${selectedDeliveryId}`}
-                className="w-full py-4 bg-aws-orange hover:bg-white text-black font-sans font-black italic uppercase text-xs tracking-widest skew-x-[-8deg] transition-all shadow-[0_0_25px_rgba(255,153,0,0.35)] flex items-center justify-center gap-2 cursor-pointer"
+              <button
+                type="button"
+                disabled
+                className="w-full py-4 bg-white/10 text-white/40 border border-white/10 font-sans font-black italic uppercase text-xs tracking-widest skew-x-[-8deg] flex items-center justify-center gap-2 cursor-not-allowed select-none"
               >
                 <span className="skew-x-[8deg] flex items-center gap-2">
-                  <ShoppingBag size={16} /> Proceed to Checkout (₹{totalAmount})
+                  <AlertTriangle size={16} className="text-red-400" />
+                  <span className="text-red-400 font-black">SOLD OUT</span> • ALL UNITS EXHAUSTED
                 </span>
-              </Link>
+              </button>
             </div>
 
             {/* Key Highlights */}
@@ -552,9 +568,14 @@ export const ProductDetailPage = () => {
                         <p className="font-sans font-bold text-xs text-white group-hover:text-aws-orange transition-colors truncate">
                           {other.shortTitle}
                         </p>
-                        <p className="font-sans font-black italic text-sm text-aws-orange">
-                          ₹{other.price} INR
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <span className="font-sans font-black italic text-sm text-aws-orange">
+                            ₹{other.price} INR
+                          </span>
+                          <span className="font-mono text-[9px] text-red-400 font-bold uppercase">
+                            Sold Out
+                          </span>
+                        </div>
                       </div>
                     </Link>
                   ))}

@@ -65,6 +65,7 @@ export interface MerchProduct {
   discountPercentage: number;
   badge: string;
   isPopular?: boolean;
+  isSoldOut?: boolean;
   rating: number;
   reviewsCount: number;
   description: string;
@@ -85,6 +86,7 @@ export const merchProducts: MerchProduct[] = [
     mrp: 499,
     discountPercentage: 50,
     badge: 'BAG + BOTTLE',
+    isSoldOut: true,
     rating: 4.9,
     reviewsCount: 142,
     description:
@@ -127,6 +129,7 @@ export const merchProducts: MerchProduct[] = [
     mrp: 299,
     discountPercentage: 50,
     badge: 'FULL SWAG KIT',
+    isSoldOut: true,
     rating: 4.95,
     reviewsCount: 218,
     description:
@@ -175,6 +178,7 @@ export const merchProducts: MerchProduct[] = [
     savings: 49,
     badge: 'BEST VALUE // ALL-IN-ONE',
     isPopular: true,
+    isSoldOut: true,
     rating: 5.0,
     reviewsCount: 380,
     description:

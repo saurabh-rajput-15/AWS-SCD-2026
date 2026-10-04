@@ -12,17 +12,20 @@ import {
   Truck,
   ShieldCheck,
   Zap,
-  Gift
+  Gift,
+  AlertTriangle
 } from 'lucide-react';
 
 const ProductCardImage = ({
   images,
   title,
-  icon: Icon
+  icon: Icon,
+  isSoldOut
 }: {
   images: string[];
   title: string;
   icon: any;
+  isSoldOut?: boolean;
 }) => {
   const [activeIdx, setActiveIdx] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -104,6 +107,14 @@ const ProductCardImage = ({
         </div>
       )}
 
+      {isSoldOut && (
+        <div className="absolute top-2.5 right-2.5 z-20">
+          <span className="px-2 py-0.5 bg-red-600/90 text-white font-mono text-[9px] font-black uppercase tracking-wider rounded shadow-md border border-red-400/40 flex items-center gap-1">
+            Sold Out
+          </span>
+        </div>
+      )}
+
       <div className="absolute bottom-2 left-2 flex items-center gap-1.5 px-2 py-1 bg-black/70 backdrop-blur-md rounded text-white/70 font-mono text-[9px] z-10">
         <Icon size={11} className="text-aws-orange" />
         <span>{activeIdx + 1}/{images.length} Photos</span>
@@ -132,9 +143,9 @@ export const MerchandiseStoreSection = () => {
             subtitle="Official SCD Dhule 2026 paddock collectibles. Select any product below for full details, specifications, and fast dispatch."
             sysId="03.MRCH"
           />
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-aws-orange/10 border border-aws-orange/30 rounded-full font-mono text-[10px] sm:text-xs text-aws-orange uppercase tracking-wider font-bold shrink-0 self-start sm:self-auto">
-            <span className="w-2 h-2 rounded-full bg-aws-orange animate-ping" />
-            <span>Official Post-Event Stock</span>
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-red-500/10 border border-red-500/30 rounded-full font-mono text-[10px] sm:text-xs text-red-400 uppercase tracking-wider font-bold shrink-0 self-start sm:self-auto">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+            <span>All Items Sold Out</span>
           </div>
         </div>
 
@@ -163,15 +174,20 @@ export const MerchandiseStoreSection = () => {
               >
                 {/* Top Badge bar */}
                 <div className="p-5 pb-0 flex items-center justify-between">
-                  <span
-                    className={`px-2.5 py-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest font-black rounded ${
-                      product.isPopular
-                        ? 'bg-aws-orange text-black font-extrabold shadow-[0_0_10px_rgba(255,153,0,0.4)]'
-                        : 'bg-aws-orange/15 text-aws-orange border border-aws-orange/30 font-bold'
-                    }`}
-                  >
-                    {product.badge}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`px-2.5 py-1 font-mono text-[9px] sm:text-[10px] uppercase tracking-widest font-black rounded ${
+                        product.isPopular
+                          ? 'bg-aws-orange text-black font-extrabold shadow-[0_0_10px_rgba(255,153,0,0.4)]'
+                          : 'bg-aws-orange/15 text-aws-orange border border-aws-orange/30 font-bold'
+                      }`}
+                    >
+                      {product.badge}
+                    </span>
+                    <span className="px-2 py-0.5 bg-red-500/20 text-red-400 border border-red-500/30 rounded font-mono text-[9px] font-bold uppercase tracking-wider inline-flex items-center gap-1">
+                      <AlertTriangle size={10} /> Sold Out
+                    </span>
+                  </div>
                   <div className="flex items-center gap-1 text-emerald-400 font-mono text-[10px] font-bold">
                     <Star size={12} fill="currentColor" />
                     <span>{product.rating}</span>
@@ -188,6 +204,7 @@ export const MerchandiseStoreSection = () => {
                     images={product.images}
                     title={product.title}
                     icon={Icon}
+                    isSoldOut={product.isSoldOut}
                   />
                 </Link>
 
@@ -230,12 +247,13 @@ export const MerchandiseStoreSection = () => {
                     </div>
                   </div>
 
-                  {/* Buy / View Details CTA Button — Uniform style across all 3 products */}
+                  {/* Buy / View Details CTA Button */}
                   <Link
                     to={`/product/${product.id}`}
-                    className="w-full py-3.5 px-4 rounded-xl font-sans font-black italic uppercase text-xs tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer bg-aws-orange text-black hover:bg-white shadow-[0_0_20px_rgba(255,153,0,0.3)] hover:shadow-[0_0_25px_rgba(255,255,255,0.4)]"
+                    className="w-full py-3.5 px-4 rounded-xl font-sans font-black italic uppercase text-xs tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer bg-white/10 hover:bg-white/20 text-white/70 hover:text-white border border-white/10"
                   >
-                    <span>View &amp; Buy (₹{product.price})</span>
+                    <span className="text-red-400 font-black">Sold Out</span>
+                    <span>• View Details</span>
                     <ArrowRight size={14} />
                   </Link>
                 </div>
@@ -247,15 +265,18 @@ export const MerchandiseStoreSection = () => {
         {/* Bottom Delivery Info Bar */}
         <div className="p-4 sm:p-5 bg-[#0a0a0a] border border-white/10 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4 text-left">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-aws-orange/10 border border-aws-orange/30 flex items-center justify-center text-aws-orange shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-500/30 flex items-center justify-center text-red-400 shrink-0">
               <Truck size={20} />
             </div>
             <div>
-              <p className="font-sans font-bold text-xs sm:text-sm text-white">
-                FREE Campus Pickup at SVKM IOT / STME Campus • Hand Delivery &amp; Pan India Courier
+              <p className="font-sans font-bold text-xs sm:text-sm text-white flex items-center gap-2">
+                All Merchandise Items Are Currently Sold Out
+                <span className="px-2 py-0.5 bg-red-500/20 text-red-400 rounded font-mono text-[9px] font-bold uppercase">
+                  Drop Closed
+                </span>
               </p>
               <p className="font-mono text-[10px] text-white/50">
-                Collect for FREE at SVKM IOT Dhule / STME Campus, or get hand delivery in Dhule (Soham) &amp; Amalner (Vaibhav), or Pan India Courier (₹99).
+                All official SCD 2026 paddock collectibles are fully reserved. Order dispatch and campus pickup desks remain active for confirmed orders.
               </p>
             </div>
           </div>
