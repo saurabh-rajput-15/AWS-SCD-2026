@@ -217,4 +217,12 @@ Refer to [deployment-guide.md](file:///markdown/deployment-guide.md) for full st
 
 ---
 
+## 🔒 License
+
+Copyright © 2026 saurabh. All rights reserved.
+
+This project is proprietary and confidential. No part of this codebase or associated documentation may be used, reproduced, modified, distributed, or transmitted in any form without express prior written permission from the copyright owner. See [LICENSE](file:///c:/Users/saura/Desktop/SAURABH/aws-scd-2026/LICENSE) for full details.
+
+---
+
 Developed for **AWS Student Community Day Dhule 2026**.
