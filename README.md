@@ -15,7 +15,7 @@ graph TD
     Client[React 19 Frontend - Vite & Tailwind CSS v4] <-->|APIs / Auth| Server[Node.js / Express API Backend]
     Server <-->|Database Queries & RLS| Supabase[Supabase PostgreSQL & Auth]
     Server <-->|Rate Limiting & Queue| Redis[Upstash Redis]
-    Server -->|Transactional Emails| Email[Resend / AWS SES]
+    Server -->|Transactional Emails| Email[Resend / Mailtrap / AWS SES]
     Client <-->|Payment Checkout| Cashfree[Cashfree Payment Gateway]
     Cashfree -->|Webhooks| Server
 ```
@@ -35,6 +35,7 @@ graph TD
 *   **QR Check-in Scanner**: Integrated HTML5 QR Code scanning route (`/scanner`) for event organizers to check in attendees at the venue in real-time.
 *   **Speaker & Sponsor Applications**: Forms for community members to submit CFPs (Call for Proposals) and sponsorship applications.
 *   **Admin Dashboard**: Manage active settings (like toggling registrations), view live ticket sales, check speaker/sponsor statuses, and run administrative overrides.
+*   **Merchandise Store**: Browse and purchase event merchandise with inventory management and order tracking.
 *   **Clean-up Schedulers**: Active background jobs to release reserved tickets if checkouts are abandoned for more than 15 minutes, and archive registrations if unpaid after 24 hours.
 
 ---
@@ -45,29 +46,39 @@ graph TD
 aws-scd-2026/
 ├── client/                 # React 19 Frontend Application
 │   ├── src/
-│   │   ├── components/     # Reusable layout sections (Hero, Tickets, FAQ, etc.)
-│   │   ├── features/       # Core modules (ticketing, scanner, admin, speaker)
-│   │   ├── lib/            # Supabase and utility configurations
-│   │   └── types/          # TypeScript definitions
+│   │   ├── components/     # Page sections & standalone pages (*Section.tsx, *Page.tsx)
+│   │   ├── data/           # Static data constants (product catalogs, configs)
+│   │   ├── features/       # Domain modules (ticketing, scanner, admin, speaker, merch)
+│   │   ├── lib/            # Shared utilities (Supabase client, API, Cashfree SDK)
+│   │   └── types/          # TypeScript declaration files (.d.ts)
+│   ├── public/             # Static assets (images, fonts, audio, video)
 │   ├── index.html          # Entry HTML page
 │   ├── package.json        # Frontend dependencies & scripts
-│   └── vite.config.ts      # Vite configuration
+│   ├── vite.config.ts      # Vite configuration
+│   └── vercel.json         # Vercel deployment config (rewrites, headers, CSP)
 │
 ├── server/                 # Express.js Backend API
 │   ├── src/
-│   │   ├── features/       # Modular backend routers (passes, checkout, webhooks, scanner, admin)
-│   │   ├── shared/         # Shared libraries (Supabase connection, error handler, middleware)
-│   │   └── app.ts          # Main application file and background processes
-│   ├── Dockerfile          # Production Docker configuration
+│   │   ├── assets/         # Server-side static files (fonts, logos for PDF/email)
+│   │   ├── features/       # Domain routers (passes, checkout, webhooks, scanner, admin, merch)
+│   │   ├── migrations/     # Incremental SQL migration scripts
+│   │   ├── shared/         # Shared libraries & middleware (Supabase, error handler, auth)
+│   │   └── app.ts          # Main application entry point & background processes
+│   ├── Dockerfile          # Multi-stage production Docker configuration
 │   └── package.json        # Backend dependencies & scripts
 │
-├── markdown/               # Architecture references & deployment instructions
-│   ├── schema.sql          # Full Database schema dump
-│   ├── deployment-guide.md # Vercel & Render step-by-step guides
+├── markdown/               # Documentation & references
+│   ├── schema.sql          # Full database schema (tables, RLS, functions) — source of truth
+│   ├── deployment-guide.md # Vercel & Render step-by-step deployment guides
+│   ├── mailtrap-setup.md   # Mailtrap DNS configuration records
 │   ├── aws-ses-setup.md    # Instructions to configure Amazon SES
-│   └── cashfree-webhook-guide.md # Webhook integration instructions
+│   ├── cashfree-webhook-guide.md  # Webhook integration instructions
+│   └── AWS_SCD_Dhule_2026_Code_of_Conduct.md  # Event Code of Conduct
 │
-├── run-dev.ps1             # Local development launch script
+├── .gitignore              # Root gitignore (node_modules, .env, dist, build)
+├── LICENSE                 # Proprietary software license (All Rights Reserved)
+├── NOTICE                  # Third-party dependency licenses attribution
+├── run-dev.ps1             # Local development launch script (Windows PowerShell)
 └── README.md               # You are here
 ```
 
@@ -91,6 +102,8 @@ cd aws-scd-2026
 ### Step 2: Configure Environment Variables
 
 Create `.env` files in both `client/` and `server/` directories based on the following configurations.
+
+> ⚠️ **Security**: Never commit `.env` files. They are excluded via `.gitignore`.
 
 #### Frontend Environment (`client/.env`)
 ```env
@@ -151,7 +164,7 @@ npm install
 
 ### Step 4: Database Setup
 
-Set up your Supabase Database by executing the SQL statements provided in [schema.sql](file:///markdown/schema.sql) in the **Supabase SQL Editor**.
+Set up your Supabase Database by executing the SQL statements provided in [`schema.sql`](markdown/schema.sql) in the **Supabase SQL Editor**.
 This script:
 1. Creates the required tables: `app_settings`, `pass_types`, `orders`, `registrations`, `payments`, `speaker_applications`, `sponsor_applications`, `email_jobs`, `email_logs`.
 2. Inserts default functions for ticket reservations (`reserve_tickets`, `release_tickets`, etc.).
@@ -188,7 +201,7 @@ You can access the client UI at `http://localhost:3000` and backend checks at `h
 
 ## 🌐 Production Deployment
 
-Refer to [deployment-guide.md](file:///markdown/deployment-guide.md) for full step-by-step instructions.
+Refer to [`deployment-guide.md`](markdown/deployment-guide.md) for full step-by-step instructions.
 
 ### 1. Backend: Deploying to Render
 *   Create a Web Service pointing to your GitHub repository.
@@ -210,18 +223,34 @@ Refer to [deployment-guide.md](file:///markdown/deployment-guide.md) for full st
 ---
 
 ## 📄 Documentation Index
-*   **Database Schema Details**: See [schema.sql](file:///markdown/schema.sql) for database table attributes and relationships.
-*   **Cashfree Webhooks Setup**: Learn how payments are verified in [cashfree-webhook-guide.md](file:///markdown/cashfree-webhook-guide.md).
-*   **Email Deliverability**: Configure AWS SES settings with [aws-ses-setup.md](file:///markdown/aws-ses-setup.md).
-*   **Full Deployment Instructions**: Access [deployment-guide.md](file:///markdown/deployment-guide.md).
+
+| Document | Description |
+|---|---|
+| [`schema.sql`](markdown/schema.sql) | Full database schema — tables, RLS policies, functions |
+| [`deployment-guide.md`](markdown/deployment-guide.md) | Vercel & Render deployment instructions |
+| [`cashfree-webhook-guide.md`](markdown/cashfree-webhook-guide.md) | Payment webhook verification setup |
+| [`aws-ses-setup.md`](markdown/aws-ses-setup.md) | AWS SES email deliverability configuration |
+| [`mailtrap-setup.md`](markdown/mailtrap-setup.md) | Mailtrap DNS records for email sending |
+| [`Code of Conduct`](markdown/AWS_SCD_Dhule_2026_Code_of_Conduct.md) | Event conduct rules for all participants |
+| [`NOTICE`](NOTICE) | Third-party dependency license attributions |
 
 ---
 
 ## 🔒 License
 
-Copyright © 2026 saurabh. All rights reserved.
+Copyright © 2026 Saurabh. All rights reserved.
 
-This project is proprietary and confidential. No part of this codebase or associated documentation may be used, reproduced, modified, distributed, or transmitted in any form without express prior written permission from the copyright owner. See [LICENSE](file:///c:/Users/saura/Desktop/SAURABH/aws-scd-2026/LICENSE) for full details.
+This project is **proprietary and confidential**. No part of this codebase, documentation, or associated files may be used, reproduced, modified, distributed, or transmitted in any form without express prior written permission from the copyright owner.
+
+This software is provided "AS IS" without warranty of any kind. See [LICENSE](LICENSE) for the full legal terms including warranty disclaimers, liability limitations, and governing law.
+
+### Contributing
+
+By submitting a pull request or contributing code to this repository in any form, you irrevocably assign all copyright and intellectual property rights in your contribution to the project copyright holder (Saurabh). See Section 3 of the [LICENSE](LICENSE) for full terms.
+
+### Third-Party Notices
+
+This project uses open-source dependencies under their respective licenses (MIT, Apache-2.0, ISC, etc.). These licenses apply only to their respective components. See [NOTICE](NOTICE) for the full attribution list.
 
 ---
 

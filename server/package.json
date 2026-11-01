@@ -1,6 +1,9 @@
 {
   "name": "aws-scd-2026-server",
   "private": true,
+  "version": "1.0.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Saurabh",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/app.ts",

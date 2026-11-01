@@ -1,7 +1,9 @@
 {
-  "name": "react-example",
+  "name": "aws-scd-2026-client",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "Saurabh",
   "type": "module",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
